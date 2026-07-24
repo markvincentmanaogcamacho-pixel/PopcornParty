@@ -52,15 +52,11 @@ body {
 }
 
 .logo {
-  height: 32px;               /* Limit logo height */
-  width: auto;
-  display: flex;
-  align-items: center;
-}
-
-.logo img {
-  height: 100%;
-  object-fit: contain;
+  color: var(--accent-red);
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-decoration: none;
+  letter-spacing: 1px;
 }
 
 .nav-links {
@@ -99,15 +95,15 @@ body {
 /* ==========================================================================
    3. HERO BANNER
    ========================================================================== */
-.hero-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;         /* Pipigilan ang pag-distort o sobrang zoom */
-  object-position: center top; 
-  z-index: -1;
+.hero {
+  position: relative;
+  height: 80vh;
+  min-height: 500px;
+  background-size: cover;
+  background-position: center top;
+  display: flex;
+  align-items: center;
+  padding: 0 4%;
 }
 
 /* Dark gradient mask that fades the hero image seamlessly into the page background */
