@@ -9,6 +9,50 @@
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script defer src="js/home.js"></script>
+  <script>
+  // Function para i-render ang episodes batay sa napiling Season
+  function renderEpisodes(seasonNumber) {
+    const container = document.getElementById('episodesList');
+    container.innerHTML = ''; // Lilinisin ang lumang listahan
+
+    // Hanapin ang tamang season sa JSON
+    const selectedSeason = seriesData.seasons.find(s => s.seasonNumber == seasonNumber);
+
+    if (!selectedSeason) return;
+
+    // I-loop at i-display ang bawat episode
+    selectedSeason.episodes.forEach(ep => {
+      const episodeHTML = `
+        <div class="episode-card" onclick="playEpisode('${ep.videoUrl}')">
+          <span class="ep-number">${ep.ep}</span>
+          <img src="${ep.thumb}" alt="${ep.title}" class="ep-thumb" />
+          <div class="ep-info">
+            <div class="ep-header">
+              <h4 class="ep-title">${ep.title}</h4>
+              <span class="ep-duration">${ep.duration}</span>
+            </div>
+            <p class="ep-desc">${ep.desc}</p>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', episodeHTML);
+    });
+  }
+
+  // Babaguhin ang listahan kapag pinalitan ng user ang dropdown option
+  function changeSeason(seasonNum) {
+    renderEpisodes(parseInt(seasonNum));
+  }
+
+  // Function kapag kini-click ang episode para i-play
+  function playEpisode(url) {
+    alert("Playing video from: " + url);
+    // Dito mo pwedeng buksan ang video player modal o i-set ang video src
+  }
+
+  // Awtomatikong i-load ang Season 1 sa simula
+  renderEpisodes(1);
+</script>
 </head>
 
 <body>
