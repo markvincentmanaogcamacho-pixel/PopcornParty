@@ -99,23 +99,15 @@ body {
 /* ==========================================================================
    3. HERO BANNER
    ========================================================================== */
-.hero {
-  position: relative;
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  
-  /* Restrict the height so it doesn't take over the whole screen */
-  height: 65vh;             /* 65% lang ng screen height */
-  max-height: 550px;         /* Max height limit para sa malalaking monitor */
-  min-height: 350px;         /* Min height para sa maliliit na screen */
-  
-  /* Background image formatting */
-  background-size: cover;    /* Poposisyonin nang tama ang pic */
-  background-position: center 20%; /* Ipi-pundar ang focal point sa center/top */
-  background-repeat: no-repeat;
-  
-  display: flex;
-  align-items: center;
-  padding: 0 4%;
+  height: 100%;
+  object-fit: cover;         /* Pipigilan ang pag-distort o sobrang zoom */
+  object-position: center top; 
+  z-index: -1;
 }
 
 /* Dark gradient mask that fades the hero image seamlessly into the page background */
