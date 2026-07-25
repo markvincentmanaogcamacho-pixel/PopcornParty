@@ -399,7 +399,7 @@
             
             <!-- Media Player Viewport -->
             <div id="modal-video-container" class="w-full bg-black relative aspect-video-player shrink-0">
-                <iframe id="embed-player" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+                <iframe id="embed-player" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media; fullscreen" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" allowfullscreen></iframe>
                 
                 <div id="player-loading-spinner" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 z-20">
                     <div class="w-12 h-12 border-4 border-brand-red border-t-transparent rounded-full animate-spin mb-3"></div>
