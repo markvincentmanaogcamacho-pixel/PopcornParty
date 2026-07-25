@@ -1,87 +1,943 @@
-/* STREAMING_CHUNK:Configuring custom animations and core body styles... */
-body {
-background-color: #141414;
-font-family: 'Inter', sans-serif;
-overflow-x: hidden;
-color: #ffffff;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeminiFlix Premium</title>
+    <!-- Tailwind CSS for high-fidelity Netflix-style responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for cinematic typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for streaming icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #141414;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            color: #ffffff;
+        }
+        /* Custom scrollbar hiding for horizontal carousels */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Gradient overlays */
+        .banner-fade-bottom {
+            height: 14rem;
+            background-image: linear-gradient(180deg, transparent, rgba(20, 20, 20, 0.7), #141414);
+        }
+        /* Movie poster hover animation */
+        .movie-card {
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: scale(1.08);
+            z-index: 30;
+            box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.9);
+        }
+        /* Glassmorphism nav header */
+        .glass-nav {
+            background-color: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(8px);
+            transition: background-color 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
+        }
+        .glass-nav.scrolled {
+            background-color: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        /* 16:9 Aspect Ratio for video container */
+        #modal-video-container {
+            aspect-ratio: 16 / 9;
+        }
+        /* Carousel navigation arrows */
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            z-index: 25;
+            opacity: 0;
+            transition: opacity 0.3s ease, background-color 0.2s ease, transform 0.2s ease;
+            border-radius: 9999px;
+            width: 3rem;
+            height: 3rem;
+        }
+        .scroll-arrow:hover {
+            background-color: #E50914;
+            transform: translateY(-50%) scale(1.1);
+        }
+        .row-container:hover .scroll-arrow {
+            opacity: 1;
+        }
+        .scroll-arrow.left { left: 0.75rem; }
+        .scroll-arrow.right { right: 0.75rem; }
+    </style>
+</head>
+<body class="text-white selection:bg-red-600 selection:text-white min-h-screen flex flex-col justify-between">
 
-/* STREAMING_CHUNK:Custom scrollbar and banner styling... /
-/ Hide scrollbars for side-scrolling carousels /
-.scrollbar-hide::-webkit-scrollbar {
-display: none;
-}
-.scrollbar-hide {
--ms-overflow-style: none; / IE/Edge /
-scrollbar-width: none; / Firefox */
-}
+    <nav id="navbar" class="glass-nav fixed top-0 left-0 right-0 z-50 px-4 py-3 md:px-12 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center justify-between">
+                <div>
+                    <a href="#" class="text-2xl md:text-3xl font-black text-red-600 tracking-wider hover:opacity-90 transition flex items-center gap-2">
+                        <i class="fa-solid fa-play-circle text-xl"></i>GEMINIFLIX
+                    </a>
+                    <p class="text-[9px] text-zinc-400 font-semibold tracking-wide">
+                        DevOps: <span class="text-red-500 font-bold">Damn-YankeeS - PhCorner Elites</span>
+                    </p>
+                </div>
+                <!-- Mobile Actions -->
+                <div class="flex items-center gap-3 md:hidden">
+                    <button onclick="toggleLanguage()" class="p-2 text-zinc-300 hover:text-white text-xs bg-zinc-800/80 rounded-full border border-zinc-700/50 w-8 h-8 flex items-center justify-center">
+                        <i class="fa-solid fa-globe"></i>
+                    </button>
+                    <img class="h-8 w-8 rounded-md border border-red-600" src="https://placehold.co/100x100/E50914/FFFFFF?text=GF" alt="Profile Avatar">
+                </div>
+            </div>
 
-/* Bottom-fade gradient shadow for the hero banner */
-.banner-fade-bottom {
-height: 12rem;
-background-image: linear-gradient(180deg, transparent, rgba(20, 20, 20, 0.6), #141414);
-}
+            <!-- Global Search & Options -->
+            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                <div class="relative w-full md:w-64">
+                    <input type="text" id="search-input" placeholder="Search movies or shows..." class="w-full bg-zinc-950/80 text-white pl-10 pr-4 py-1.5 rounded-full text-xs border border-zinc-700 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all duration-300">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-zinc-400 text-xs"></i>
+                    <button id="search-clear-btn" class="hidden absolute right-3 top-2 text-zinc-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                </div>
 
-/* STREAMING_CHUNK:Movie card interactions and hover effects... /
-/ Movie card hover zoom effects */
-.movie-card {
-transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease;
-}
-.movie-card:hover {
-transform: scale(1.08);
-z-index: 30;
-box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.9), 0 8px 10px -6px rgba(0, 0, 0, 0.9);
-}
+                <div class="hidden md:flex items-center gap-3">
+                    <button id="nav-watchlist-btn" onclick="scrollToWatchlist()" class="text-xs font-semibold px-3 py-1.5 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-200 border border-zinc-700/50 rounded-full flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-bookmark text-red-500"></i> <span data-translate="myList">My List</span>
+                    </button>
+                    <button onclick="toggleLanguage()" class="text-xs font-semibold px-3 py-1.5 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-200 border border-zinc-700/50 rounded-full flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-globe text-red-500"></i>
+                        <span id="lang-label">EN</span>
+                    </button>
+                    <img class="h-9 w-9 rounded-md border border-red-600 hover:scale-105 transition duration-300 cursor-pointer" src="https://placehold.co/100x100/E50914/FFFFFF?text=GF" alt="Profile Avatar">
+                </div>
+            </div>
+        </div>
+    </nav>
 
-/* STREAMING_CHUNK:Glassmorphic header navigation styling... /
-/ Glassmorphic navigation header */
-.glass-nav {
-background-color: rgba(20, 20, 20, 0.0);
-backdrop-filter: blur(0px);
-transition: background-color 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
-}
-.glass-nav.scrolled {
-background-color: rgba(20, 20, 20, 0.95);
-backdrop-filter: blur(12px);
-border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
+    <header id="banner" class="relative text-white bg-cover bg-center flex items-end min-h-[70vh] md:min-h-[85vh] transition-all duration-500" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80');">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#141414] via-black/40 to-black/60 z-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10"></div>
 
-/* STREAMING_CHUNK:Media player aspect ratios and scroll buttons... /
-/ Aspect ratio for the streaming player iframe */
-#modal-video-container {
-aspect-ratio: 16 / 9;
-}
+        <div class="relative max-w-7xl mx-auto w-full px-6 md:px-12 pb-20 z-20">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-red-600/90 text-white rounded-full text-[10px] uppercase tracking-widest font-black mb-4 backdrop-blur-md">
+                <i class="fa-solid fa-crown text-amber-300"></i> <span data-translate="featuredSpotlight">Featured Spotlight</span>
+            </div>
+            <h1 id="banner-title" class="text-3xl md:text-6xl font-extrabold pb-3 tracking-tight leading-none drop-shadow-lg max-w-4xl">
+                Loading Featured Stream...
+            </h1>
+            <p id="banner-description" class="w-full md:max-w-2xl text-sm md:text-base text-zinc-300 font-medium leading-relaxed drop-shadow h-20 overflow-hidden line-clamp-3 mb-6">
+                Discover trending movies, high-definition series, and live titles powered by GeminiFlix.
+            </p>
+            <div class="flex flex-wrap gap-3">
+                <button id="banner-play-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg px-8 py-3.5 active:scale-95 transition text-sm md:text-base flex items-center justify-center gap-2 shadow-xl">
+                    <i class="fa-solid fa-play text-lg"></i> <span data-translate="play">Play Now</span>
+                </button>
+                <button id="banner-info-btn" class="bg-zinc-800/90 hover:bg-zinc-700/90 text-white font-bold rounded-lg px-8 py-3.5 active:scale-95 transition text-sm md:text-base border border-zinc-700/60 flex items-center justify-center gap-2 backdrop-blur-md">
+                    <i class="fa-solid fa-circle-info text-lg"></i> <span data-translate="moreInfo">More Info</span>
+                </button>
+            </div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 banner-fade-bottom"></div>
+    </header>
 
-/* Row carousel navigation arrows */
-.scroll-arrow {
-position: absolute;
-top: 50%;
-transform: translateY(-50%);
-background-color: rgba(0, 0, 0, 0.7);
-color: white;
-border: 1px solid rgba(255, 255, 255, 0.1);
-cursor: pointer;
-z-index: 25;
-opacity: 0;
-transition: opacity 0.3s ease, background-color 0.2s ease, transform 0.2s ease;
-border-radius: 9999px;
-width: 3rem;
-height: 3rem;
-}
+    <main class="max-w-7xl mx-auto px-4 md:px-12 pb-24 relative -mt-10 z-30 w-full flex-grow">
+        <!-- Live Real-Time Search Results Section -->
+        <div id="search-row-container" class="hidden mb-12">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl md:text-2xl font-extrabold tracking-tight text-red-500 flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass"></i> <span data-translate="searchResults">Search Results</span>
+                </h2>
+                <button onclick="clearSearch()" class="text-xs text-zinc-400 hover:text-white transition">Clear search</button>
+            </div>
+            <div class="relative row-container">
+                <div id="search-results-row" class="flex overflow-y-hidden overflow-x-scroll py-4 px-2 -ml-2 scrollbar-hide gap-4">
+                    <!-- Dynamic search cards -->
+                </div>
+            </div>
+        </div>
 
-.scroll-arrow:hover {
-background-color: #E50914;
-transform: translateY(-50%) scale(1.1);
-}
+        <!-- Custom User Watchlist Row -->
+        <div id="watchlist-row-container" class="hidden mb-12">
+            <h2 class="text-xl md:text-2xl font-bold tracking-tight mb-4 text-red-500 flex items-center gap-2">
+                <i class="fa-solid fa-bookmark"></i> <span data-translate="myList">My List</span>
+            </h2>
+            <div class="relative row-container">
+                <div id="watchlist-row" class="flex overflow-y-hidden overflow-x-scroll py-4 px-2 -ml-2 scrollbar-hide gap-4">
+                    <!-- Dynamic watchlist cards -->
+                </div>
+            </div>
+        </div>
 
-.row-container:hover .scroll-arrow {
-opacity: 1;
-}
+        <!-- Dynamic Content Rows injected here -->
+        <div id="movie-rows" class="space-y-10">
+            <!-- Movie rows generated dynamically -->
+        </div>
+    </main>
 
-.scroll-arrow.left {
-left: 0.75rem;
-}
+    <div id="modal-overlay" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all duration-300 opacity-0">
+        <div id="modal-container" class="relative bg-zinc-900 w-full max-w-4xl rounded-2xl shadow-2xl border border-zinc-800 overflow-hidden transform scale-95 transition-all duration-300">
+            <!-- Close Trigger -->
+            <button id="modal-close-btn" class="absolute top-4 right-4 text-white bg-black/70 backdrop-blur-md rounded-full h-10 w-10 flex items-center justify-center z-30 hover:bg-red-600 hover:scale-105 transition duration-200">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <!-- Media Player Window -->
+            <div id="modal-video-container" class="w-full bg-zinc-950 relative">
+                <iframe id="youtube-player" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+                <div id="no-trailer-message" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-zinc-950">
+                    <i class="fa-solid fa-video-slash text-5xl text-zinc-600 mb-3 animate-pulse"></i>
+                    <p class="text-lg font-semibold text-zinc-300" data-translate="noTrailer">Trailer or media stream directly loading...</p>
+                    <p class="text-xs text-zinc-500 mt-1">Select "Play Video Stream" to launch video embed.</p>
+                </div>
+            </div>
 
-.scroll-arrow.right {
-right: 0.75rem;
-}
+            <!-- Player Source Controls -->
+            <div class="bg-zinc-950 px-6 py-3 flex flex-wrap gap-2 items-center justify-between border-b border-zinc-800">
+                <div class="flex gap-2">
+                    <button id="btn-toggle-trailer" class="px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 bg-zinc-800 text-zinc-300 hover:bg-zinc-700">
+                        <i class="fa-solid fa-film"></i> <span data-translate="watchTrailer">Trailer</span>
+                    </button>
+                    <button id="btn-toggle-stream" class="px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 bg-red-600 text-white shadow-lg">
+                        <i class="fa-solid fa-play"></i> <span data-translate="streamFull">Play Video Stream</span>
+                    </button>
+                </div>
+                <div id="stream-server-info" class="text-[11px] text-emerald-400 flex items-center gap-2 font-medium">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>Server Status: Online (1080p Stream)</span>
+                </div>
+            </div>
+
+            <!-- TV Episode Selector -->
+            <div id="tv-episode-selector" class="hidden bg-zinc-900/80 px-6 py-3 border-b border-zinc-800">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-zinc-400" data-translate="season">Season:</span>
+                        <select id="tv-season-select" class="bg-zinc-800 text-white border border-zinc-700 rounded-lg px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600"></select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-zinc-400" data-translate="episode">Episode:</span>
+                        <select id="tv-episode-select" class="bg-zinc-800 text-white border border-zinc-700 rounded-lg px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600"></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Text Details Body -->
+            <div id="modal-details" class="p-6 md:p-8 space-y-4 max-h-[35vh] overflow-y-auto scrollbar-hide">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <h2 id="modal-title" class="text-2xl md:text-3xl font-extrabold tracking-tight">Loading Title...</h2>
+                    <button id="modal-watchlist-btn" class="px-4 py-2 rounded-full text-xs font-bold bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 transition flex items-center gap-2 shrink-0">
+                        <i id="modal-watchlist-icon" class="fa-solid fa-plus text-red-500"></i>
+                        <span id="modal-watchlist-text" data-translate="myList">My List</span>
+                    </button>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-3 text-xs font-semibold text-zinc-400">
+                    <span id="modal-rating" class="text-amber-400 flex items-center"></span>
+                    <span id="modal-release-date" class="bg-zinc-800 px-2.5 py-1 rounded"></span>
+                    <span id="modal-type" class="bg-zinc-800 px-2.5 py-1 rounded text-red-500"></span>
+                </div>
+
+                <p id="modal-description" class="text-sm md:text-base leading-relaxed text-zinc-300"></p>
+
+                <!-- Streaming Providers -->
+                <div id="watch-providers" class="mt-4 border-t border-zinc-800/80 pt-4">
+                    <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2" data-translate="watchNow">Watch Now On:</h3>
+                    <div id="providers-list" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-500 bg-red-600 text-white font-bold px-6 py-3.5 rounded-xl shadow-2xl flex items-center gap-3">
+        <i class="fa-solid fa-bell"></i>
+        <span id="toast-message">Notification context</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-zinc-950 border-t border-zinc-900 py-8 px-6 text-center text-xs text-zinc-500">
+        <p>© 2026 GeminiFlix Premium. Crafted for PhCorner Elites - Damn-YankeeS DevOps.</p>
+    </footer>
+
+    <script>
+        const API_KEY = '0df126d14bdf9c91c1cd3cd84b819db6';
+        const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500/';
+        const IMAGE_ORIGINAL_URL = 'https://image.tmdb.org/t/p/original/';
+        const ADSTERRA_URL = 'https://6a5a30083cf4f3931ab9a422--starlit-custard-0d7c40.netlify.app';
+
+        // High-fidelity fallback catalog so app ALWAYS works immediately even if API is slow or offline
+        const FALLBACK_MOVIES = [
+            {
+                id: 550,
+                title: "Fight Club",
+                name: "Fight Club",
+                overview: "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more.",
+                poster_path: "/pB8BM7PDSp6B6Ih7QIp4G33L3L7.jpg",
+                backdrop_path: "/hZk239A32d3A3G313a3G3a.jpg",
+                vote_average: 8.4,
+                release_date: "1999-10-15",
+                media_type: "movie",
+                youtube_key: "qtRKDV93s2s"
+            },
+            {
+                id: 157336,
+                title: "Interstellar",
+                name: "Interstellar",
+                overview: "The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel.",
+                poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+                backdrop_path: "/xJHokMbljvjADYdit5fK1DV3A2.jpg",
+                vote_average: 8.6,
+                release_date: "2014-11-05",
+                media_type: "movie",
+                youtube_key: "zSWdZVtXT7E"
+            },
+            {
+                id: 27205,
+                title: "Inception",
+                name: "Inception",
+                overview: "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life.",
+                poster_path: "/oYu23218218.jpg",
+                backdrop_path: "/s3T1313.jpg",
+                vote_average: 8.4,
+                release_date: "2010-07-15",
+                media_type: "movie",
+                youtube_key: "YoHD9XEInc0"
+            },
+            {
+                id: 299536,
+                title: "Avengers: Infinity War",
+                name: "Avengers: Infinity War",
+                overview: "As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos.",
+                poster_path: "/7WsyChLLEP32A3218.jpg",
+                backdrop_path: "/lmCh3218218.jpg",
+                vote_average: 8.3,
+                release_date: "2018-04-25",
+                media_type: "movie",
+                youtube_key: "6ZfuNTqbHE8"
+            },
+            {
+                id: 1396,
+                title: "Breaking Bad",
+                name: "Breaking Bad",
+                overview: "Walter White, a New Mexico chemistry teacher, is diagnosed with Stage III cancer and given a prognosis of two years left to live. He chooses to enter the world of drugs and crime.",
+                poster_path: "/ggFH1313.jpg",
+                backdrop_path: "/tsRy3218218.jpg",
+                vote_average: 8.9,
+                release_date: "2008-01-20",
+                media_type: "tv",
+                seasons: [{ season_number: 1, episode_count: 7 }, { season_number: 2, episode_count: 13 }],
+                youtube_key: "HhesaQXLuRY"
+            },
+            {
+                id: 66732,
+                title: "Stranger Things",
+                name: "Stranger Things",
+                overview: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.",
+                poster_path: "/49WJfeN313.jpg",
+                backdrop_path: "/56v2313.jpg",
+                vote_average: 8.6,
+                release_date: "2016-07-15",
+                media_type: "tv",
+                seasons: [{ season_number: 1, episode_count: 8 }, { season_number: 2, episode_count: 9 }],
+                youtube_key: "b9EkMc79ZSU"
+            }
+        ];
+
+        // State variables
+        let currentLanguage = localStorage.getItem('gflix_lang') || 'en';
+        let watchlist = JSON.parse(localStorage.getItem('gflix_watchlist')) || [];
+        let currentPlayMode = 'stream';
+        let selectedMovieDetails = null;
+        let selectedMediaType = 'movie';
+
+        // Translation profiles
+        const translations = {
+            en: {
+                myList: "My List",
+                play: "Play Now",
+                moreInfo: "More Info",
+                searchResults: "Search Results",
+                watchNow: "Watch Now On:",
+                noTrailer: "Trailer loading...",
+                searchPlaceholder: "Search movies or shows...",
+                addedToList: "Added to My List!",
+                removedFromList: "Removed from My List!",
+                featuredSpotlight: "Featured Spotlight",
+                trendingNow: "Trending Now",
+                topRated: "Top Rated Movies",
+                actionMovies: "Action & Thrillers",
+                tvShows: "Popular TV Series",
+                watchTrailer: "Watch Trailer",
+                streamFull: "Play Video Stream",
+                season: "Season",
+                episode: "Episode"
+            },
+            tl: {
+                myList: "Aking Listahan",
+                play: "I-play Ngayon",
+                moreInfo: "Impormasyon",
+                searchResults: "Resulta ng Paghahanap",
+                watchNow: "Panoorin Ngayon sa:",
+                noTrailer: "Naglo-load ang trailer...",
+                searchPlaceholder: "Maghanap ng pelikula o palabas...",
+                addedToList: "Naidagdag sa Aking Listahan!",
+                removedFromList: "Inalis sa Aking Listahan!",
+                featuredSpotlight: "Pangunahing Tampok",
+                trendingNow: "Sikat Ngayon",
+                topRated: "Mataas ang Marka",
+                actionMovies: "Aksyon at Thriller",
+                tvShows: "Sikat na Serye sa TV",
+                watchTrailer: "Panoorin ang Trailer",
+                streamFull: "I-stream ang Video",
+                season: "Kabanata",
+                episode: "Yugto"
+            }
+        };
+
+        const requests = {
+            fetchTrending: `/trending/all/week?api_key=${API_KEY}&language=en-US`,
+            fetchTopRated: `/movie/top_rated?api_key=${API_KEY}&language=en-US`,
+            fetchActionMovies: `/discover/movie?api_key=${API_KEY}&with_genres=28`,
+            fetchTvShows: `/discover/tv?api_key=${API_KEY}&with_genres=10759`,
+            fetchComedyMovies: `/discover/movie?api_key=${API_KEY}&with_genres=35`,
+            fetchHorrorMovies: `/discover/movie?api_key=${API_KEY}&with_genres=27`
+        };
+
+        function showToast(message) {
+            const toastEl = document.getElementById('toast');
+            const toastMessageEl = document.getElementById('toast-message');
+            toastMessageEl.textContent = message;
+            toastEl.classList.remove('translate-y-20', 'opacity-0');
+            toastEl.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toastEl.classList.add('translate-y-20', 'opacity-0');
+                toastEl.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        async function fetchData(endpoint) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 second timeout
+                const response = await fetch(`https://api.themoviedb.org/3${endpoint}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error(`HTTP network error: ${response.status}`);
+                const data = await response.json();
+                return (data.results && data.results.length > 0) ? data.results : FALLBACK_MOVIES;
+            } catch (error) {
+                console.warn("API request failed or timed out, using high-fidelity local content:", error);
+                return FALLBACK_MOVIES;
+            }
+        }
+
+        async function fetchMovieDetails(movieId, mediaType) {
+            const type = mediaType === 'tv' ? 'tv' : 'movie';
+            try {
+                const url = `https://api.themoviedb.org/3/${type}/${movieId}?api_key=${API_KEY}&language=${currentLanguage === 'tl' ? 'tl-PH' : 'en-US'}&append_to_response=videos,watch/providers`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to retrieve metadata.');
+                return await response.json();
+            } catch (error) {
+                const fallback = FALLBACK_MOVIES.find(m => m.id == movieId) || FALLBACK_MOVIES[0];
+                return fallback;
+            }
+        }
+
+        function createMovieRow(title, movies, isLargeRow = false) {
+            const container = document.getElementById('movie-rows');
+            const row = document.createElement('div');
+            row.className = 'my-6 relative';
+
+            const rowTitle = document.createElement('h2');
+            rowTitle.className = 'text-lg md:text-xl font-bold mb-3 tracking-wide text-zinc-100 flex items-center gap-2';
+            rowTitle.innerHTML = `<span class="w-1 h-5 bg-red-600 rounded-full inline-block"></span>${title}`;
+            row.appendChild(rowTitle);
+
+            const rowContainer = document.createElement('div');
+            rowContainer.className = 'relative row-container group';
+            row.appendChild(rowContainer);
+
+            const postersContainer = document.createElement('div');
+            postersContainer.className = 'flex overflow-y-hidden overflow-x-scroll py-4 px-2 -ml-2 scrollbar-hide gap-3.5 scroll-smooth';
+            rowContainer.appendChild(postersContainer);
+
+            movies.forEach(movie => {
+                const imagePath = isLargeRow ? movie.poster_path : (movie.backdrop_path || movie.poster_path);
+                if (!imagePath) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = `flex-shrink-0 relative cursor-pointer movie-card rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-950 ${isLargeRow ? 'w-32 md:w-48' : 'w-52 md:w-72'}`;
+
+                const poster = document.createElement('img');
+                const srcUrl = imagePath.startsWith('http') ? imagePath : `${IMAGE_BASE_URL}${imagePath}`;
+                poster.src = srcUrl;
+                poster.alt = movie.name || movie.title || "Movie Poster";
+                poster.loading = 'lazy';
+                poster.className = 'w-full object-cover h-full';
+                poster.onerror = function() {
+                    this.src = `https://placehold.co/400x600/141414/FFFFFF?text=${encodeURIComponent(movie.name || movie.title || 'GeminiFlix')}`;
+                };
+                
+                wrapper.dataset.movieId = movie.id;
+                wrapper.dataset.mediaType = movie.media_type || (isLargeRow ? 'tv' : 'movie');
+                wrapper.addEventListener('click', handleMovieCardClick);
+
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-3';
+                overlay.innerHTML = `
+                    <div class="text-[11px] w-full">
+                        <p class="font-extrabold text-white truncate w-full">${movie.name || movie.title || 'Featured Title'}</p>
+                        <div class="flex items-center justify-between mt-1">
+                            <span class="text-zinc-300 text-[10px]"><i class="fa-solid fa-star text-amber-400 mr-1"></i>${movie.vote_average ? movie.vote_average.toFixed(1) : '8.5'}</span>
+                            <span class="bg-red-600 text-[9px] font-black px-2 py-0.5 rounded text-white tracking-widest uppercase">Stream</span>
+                        </div>
+                    </div>
+                `;
+
+                wrapper.appendChild(poster);
+                wrapper.appendChild(overlay);
+                postersContainer.appendChild(wrapper);
+            });
+
+            // Navigation Arrows
+            const leftArrow = document.createElement('button');
+            leftArrow.className = 'scroll-arrow left hidden md:flex items-center justify-center';
+            leftArrow.innerHTML = '<i class="fa-solid fa-chevron-left text-sm"></i>';
+            leftArrow.addEventListener('click', () => {
+                postersContainer.scrollBy({ left: -window.innerWidth * 0.6, behavior: 'smooth' });
+            });
+            rowContainer.appendChild(leftArrow);
+
+            const rightArrow = document.createElement('button');
+            rightArrow.className = 'scroll-arrow right hidden md:flex items-center justify-center';
+            rightArrow.innerHTML = '<i class="fa-solid fa-chevron-right text-sm"></i>';
+            rightArrow.addEventListener('click', () => {
+                postersContainer.scrollBy({ left: window.innerWidth * 0.6, behavior: 'smooth' });
+            });
+            rowContainer.appendChild(rightArrow);
+
+            container.appendChild(row);
+        }
+
+        async function handleMovieCardClick(event) {
+            try {
+                window.open(ADSTERRA_URL, '_blank');
+            } catch(e){}
+
+            const target = event.currentTarget;
+            const { movieId, mediaType } = target.dataset;
+            if (!movieId) return;
+
+            const details = await fetchMovieDetails(movieId, mediaType);
+            if (details) {
+                currentPlayMode = 'stream';
+                displayModalWithDetails(details, mediaType || 'movie');
+            }
+        }
+
+        function displayModalWithDetails(details, type) {
+            selectedMovieDetails = details;
+            selectedMediaType = type;
+
+            document.getElementById('modal-title').textContent = details.name || details.title || "Featured Title";
+            document.getElementById('modal-description').textContent = details.overview || "Stream this full title live in 1080p high definition on GeminiFlix Premium.";
+            
+            document.getElementById('modal-rating').innerHTML = `<i class="fa-solid fa-star text-amber-400 mr-1"></i> ${details.vote_average ? details.vote_average.toFixed(1) : '8.5'}`;
+            document.getElementById('modal-release-date').textContent = `Release: ${details.release_date || details.first_air_date || '2024'}`;
+            document.getElementById('modal-type').textContent = `Format: ${type === 'tv' ? 'TV Series' : 'Movie'}`;
+
+            const watchlistBtn = document.getElementById('modal-watchlist-btn');
+            const isInList = watchlist.some(item => item.id == details.id);
+            updateWatchlistBtnUI(isInList);
+
+            watchlistBtn.onclick = () => {
+                toggleWatchlistElement(details, type);
+            };
+
+            const tvEpisodeSelector = document.getElementById('tv-episode-selector');
+            const seasonSelect = document.getElementById('tv-season-select');
+            const episodeSelect = document.getElementById('tv-episode-select');
+
+            if (type === 'tv') {
+                tvEpisodeSelector.classList.remove('hidden');
+                seasonSelect.innerHTML = '';
+                const seasons = details.seasons || [{ season_number: 1, episode_count: 10 }];
+
+                seasons.filter(s => s.season_number > 0).forEach(season => {
+                    const option = document.createElement('option');
+                    option.value = season.season_number;
+                    option.textContent = `Season ${season.season_number}`;
+                    seasonSelect.appendChild(option);
+                });
+
+                const buildEpisodes = () => {
+                    episodeSelect.innerHTML = '';
+                    const activeSeasonNum = parseInt(seasonSelect.value) || 1;
+                    const selectedSeasonObj = seasons.find(s => s.season_number === activeSeasonNum) || { episode_count: 10 };
+                    
+                    for (let i = 1; i <= (selectedSeasonObj.episode_count || 10); i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = `Episode ${i}`;
+                        episodeSelect.appendChild(option);
+                    }
+                };
+
+                seasonSelect.onchange = () => { buildEpisodes(); updatePlayerFrame(); };
+                episodeSelect.onchange = () => { updatePlayerFrame(); };
+                buildEpisodes();
+            } else {
+                tvEpisodeSelector.classList.add('hidden');
+            }
+
+            document.getElementById('btn-toggle-trailer').onclick = () => { currentPlayMode = 'trailer'; updatePlayerFrame(); };
+            document.getElementById('btn-toggle-stream').onclick = () => { currentPlayMode = 'stream'; updatePlayerFrame(); };
+
+            updatePlayerFrame();
+
+            // Populate Providers
+            const providersList = document.getElementById('providers-list');
+            providersList.innerHTML = `
+                <span class="px-3 py-1 bg-zinc-800 text-xs rounded-lg text-zinc-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-400"></i> GeminiFlix Stream Pass</span>
+                <span class="px-3 py-1 bg-zinc-800 text-xs rounded-lg text-zinc-300 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-red-500"></i> HD 1080p Direct</span>
+            `;
+
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalContainer = document.getElementById('modal-container');
+            modalOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                modalOverlay.classList.remove('opacity-0');
+                modalContainer.classList.remove('scale-95');
+                modalContainer.classList.add('scale-100');
+            }, 50);
+        }
+
+        function updatePlayerFrame() {
+            if (!selectedMovieDetails) return;
+
+            const youtubePlayer = document.getElementById('youtube-player');
+            const noTrailerMessage = document.getElementById('no-trailer-message');
+            const btnToggleTrailer = document.getElementById('btn-toggle-trailer');
+            const btnToggleStream = document.getElementById('btn-toggle-stream');
+            const streamServerInfo = document.getElementById('stream-server-info');
+
+            if (currentPlayMode === 'trailer') {
+                btnToggleTrailer.className = "px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 bg-red-600 text-white shadow-lg";
+                btnToggleStream.className = "px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 bg-zinc-800 text-zinc-300 hover:bg-zinc-700";
+                streamServerInfo.classList.add('hidden');
+
+                const trailer = selectedMovieDetails.videos?.results?.find(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')) || 
+                                { key: selectedMovieDetails.youtube_key || 'zSWdZVtXT7E' };
+
+                if (trailer && trailer.key) {
+                    youtubePlayer.src = `https://www.youtube.com/embed/${trailer.key}?autoplay=1&mute=0&rel=0`;
+                    youtubePlayer.classList.remove('hidden');
+                    noTrailerMessage.classList.add('hidden');
+                } else {
+                    youtubePlayer.src = '';
+                    youtubePlayer.classList.add('hidden');
+                    noTrailerMessage.classList.remove('hidden');
+                }
+            } else {
+                btnToggleTrailer.className = "px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 bg-zinc-800 text-zinc-300 hover:bg-zinc-700";
+                btnToggleStream.className = "px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 bg-red-600 text-white shadow-lg";
+                streamServerInfo.classList.remove('hidden');
+                
+                noTrailerMessage.classList.add('hidden');
+                youtubePlayer.classList.remove('hidden');
+
+                if (selectedMediaType === 'tv') {
+                    const season = document.getElementById('tv-season-select').value || 1;
+                    const episode = document.getElementById('tv-episode-select').value || 1;
+                    youtubePlayer.src = `https://vidsrc.to/embed/tv/${selectedMovieDetails.id}/${season}/${episode}`;
+                } else {
+                    youtubePlayer.src = `https://vidsrc.to/embed/movie/${selectedMovieDetails.id}`;
+                }
+            }
+        }
+
+        function closeModal() {
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalContainer = document.getElementById('modal-container');
+            const youtubePlayer = document.getElementById('youtube-player');
+
+            modalOverlay.classList.add('opacity-0');
+            modalContainer.classList.add('scale-95');
+            modalContainer.classList.remove('scale-100');
+            setTimeout(() => {
+                modalOverlay.classList.add('hidden');
+                youtubePlayer.src = '';
+            }, 300);
+        }
+
+        function toggleWatchlistElement(movie, type) {
+            const index = watchlist.findIndex(item => item.id == movie.id);
+            const t = translations[currentLanguage];
+
+            if (index > -1) {
+                watchlist.splice(index, 1);
+                showToast(t.removedFromList);
+                updateWatchlistBtnUI(false);
+            } else {
+                watchlist.push({
+                    id: movie.id,
+                    title: movie.title || movie.name,
+                    name: movie.name || movie.title,
+                    poster_path: movie.poster_path,
+                    backdrop_path: movie.backdrop_path,
+                    media_type: type,
+                    vote_average: movie.vote_average
+                });
+                showToast(t.addedToList);
+                updateWatchlistBtnUI(true);
+            }
+
+            localStorage.setItem('gflix_watchlist', JSON.stringify(watchlist));
+            renderWatchlistRow();
+        }
+
+        function updateWatchlistBtnUI(isInList) {
+            const icon = document.getElementById('modal-watchlist-icon');
+            const text = document.getElementById('modal-watchlist-text');
+            const t = translations[currentLanguage];
+
+            if (isInList) {
+                icon.className = 'fa-solid fa-check text-emerald-400';
+                text.textContent = t.myList;
+            } else {
+                icon.className = 'fa-solid fa-plus text-red-500';
+                text.textContent = t.myList;
+            }
+        }
+
+        function renderWatchlistRow() {
+            const container = document.getElementById('watchlist-row-container');
+            const row = document.getElementById('watchlist-row');
+            row.innerHTML = '';
+
+            if (watchlist.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            
+            watchlist.forEach(movie => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex-shrink-0 relative cursor-pointer movie-card rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-950 w-32 md:w-44';
+
+                const poster = document.createElement('img');
+                const srcUrl = movie.poster_path?.startsWith('http') ? movie.poster_path : `${IMAGE_BASE_URL}${movie.poster_path}`;
+                poster.src = srcUrl;
+                poster.alt = movie.name || movie.title;
+                poster.className = 'w-full object-cover h-full';
+
+                wrapper.dataset.movieId = movie.id;
+                wrapper.dataset.mediaType = movie.media_type;
+                wrapper.addEventListener('click', handleMovieCardClick);
+
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-2';
+                overlay.innerHTML = `
+                    <div class="text-[10px]">
+                        <p class="font-bold text-white truncate w-full">${movie.name || movie.title}</p>
+                        <p class="text-zinc-400 mt-0.5 text-[9px]"><i class="fa-solid fa-star text-amber-400 mr-1"></i>${movie.vote_average ? movie.vote_average.toFixed(1) : 'NR'}</p>
+                    </div>
+                `;
+
+                wrapper.appendChild(poster);
+                wrapper.appendChild(overlay);
+                row.appendChild(wrapper);
+            });
+        }
+
+        function scrollToWatchlist() {
+            const el = document.getElementById('watchlist-row-container');
+            if (el && !el.classList.contains('hidden')) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                showToast("Your My List is empty! Add movies by clicking + My List");
+            }
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'tl' : 'en';
+            localStorage.setItem('gflix_lang', currentLanguage);
+            updatePageTranslations();
+            showToast(currentLanguage === 'en' ? "Language: English" : "Wika: Filipino");
+        }
+
+        function updatePageTranslations() {
+            const t = translations[currentLanguage];
+            document.getElementById('lang-label').textContent = currentLanguage.toUpperCase();
+            
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (t[key]) el.textContent = t[key];
+            });
+
+            document.getElementById('search-input').placeholder = t.searchPlaceholder;
+            initializeCatalog();
+        }
+
+        let searchTimeout = null;
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+            const searchClearBtn = document.getElementById('search-clear-btn');
+            
+            if (value.length > 0) {
+                searchClearBtn.classList.remove('hidden');
+            } else {
+                searchClearBtn.classList.add('hidden');
+            }
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                executeLiveSearch(value);
+            }, 300);
+        });
+
+        document.getElementById('search-clear-btn').addEventListener('click', clearSearch);
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-clear-btn').classList.add('hidden');
+            document.getElementById('search-row-container').classList.add('hidden');
+            document.getElementById('search-results-row').innerHTML = '';
+        }
+
+        async function executeLiveSearch(query) {
+            const searchRowContainer = document.getElementById('search-row-container');
+            const searchResultsRow = document.getElementById('search-results-row');
+
+            if (!query) {
+                searchRowContainer.classList.add('hidden');
+                return;
+            }
+
+            let results = [];
+            try {
+                const response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    results = data.results || [];
+                }
+            } catch (e) {}
+
+            if (results.length === 0) {
+                results = FALLBACK_MOVIES.filter(m => (m.title || m.name).toLowerCase().includes(query.toLowerCase()));
+            }
+
+            searchResultsRow.innerHTML = '';
+            if (results.length > 0) {
+                searchRowContainer.classList.remove('hidden');
+                results.forEach(movie => {
+                    const imagePath = movie.poster_path || movie.backdrop_path;
+                    if (!imagePath) return;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'flex-shrink-0 relative cursor-pointer movie-card rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 w-32 md:w-44';
+
+                    const poster = document.createElement('img');
+                    const srcUrl = imagePath.startsWith('http') ? imagePath : `${IMAGE_BASE_URL}${imagePath}`;
+                    poster.src = srcUrl;
+                    poster.alt = movie.name || movie.title;
+                    poster.className = 'w-full object-cover h-full';
+
+                    wrapper.dataset.movieId = movie.id;
+                    wrapper.dataset.mediaType = movie.media_type || 'movie';
+                    wrapper.addEventListener('click', handleMovieCardClick);
+
+                    const overlay = document.createElement('div');
+                    overlay.className = 'absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-2';
+                    overlay.innerHTML = `
+                        <div class="text-[10px]">
+                            <p class="font-bold text-white truncate w-full">${movie.name || movie.title}</p>
+                            <p class="text-zinc-400 mt-0.5 text-[9px]"><i class="fa-solid fa-star text-amber-400 mr-1"></i>${movie.vote_average ? movie.vote_average.toFixed(1) : 'NR'}</p>
+                        </div>
+                    `;
+
+                    wrapper.appendChild(poster);
+                    wrapper.appendChild(overlay);
+                    searchResultsRow.appendChild(wrapper);
+                });
+            } else {
+                searchRowContainer.classList.add('hidden');
+            }
+        }
+
+        async function initializeCatalog() {
+            document.getElementById('movie-rows').innerHTML = '';
+            renderWatchlistRow();
+
+            const t = translations[currentLanguage];
+
+            // Banner Setup
+            const bannerMovie = FALLBACK_MOVIES[1]; // Interstellar default backdrop
+            const bannerBackdrop = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80";
+            
+            document.getElementById('banner').style.backgroundImage = `url('${bannerBackdrop}')`;
+            document.getElementById('banner-title').textContent = bannerMovie.title;
+            document.getElementById('banner-description').textContent = bannerMovie.overview;
+
+            document.getElementById('banner-play-btn').onclick = () => {
+                displayModalWithDetails(bannerMovie, 'movie');
+            };
+            document.getElementById('banner-info-btn').onclick = () => {
+                displayModalWithDetails(bannerMovie, 'movie');
+            };
+
+            // Build Row Lists
+            const rowsConfig = [
+                { title: t.trendingNow, endpoint: requests.fetchTrending, isLarge: true },
+                { title: t.topRated, endpoint: requests.fetchTopRated, isLarge: false },
+                { title: t.actionMovies, endpoint: requests.fetchActionMovies, isLarge: false },
+                { title: t.tvShows, endpoint: requests.fetchTvShows, isLarge: false }
+            ];
+
+            for (const config of rowsConfig) {
+                const movies = await fetchData(config.endpoint);
+                createMovieRow(config.title, movies, config.isLarge);
+            }
+        }
+
+        // Global Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePageTranslations();
+
+            document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+            document.getElementById('modal-overlay').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('modal-overlay')) closeModal();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            window.addEventListener('scroll', () => {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 60) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
