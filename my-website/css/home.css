@@ -1,87 +1,1414 @@
-/* STREAMING_CHUNK:Configuring custom animations and core body styles... */
-body {
-background-color: #141414;
-font-family: 'Inter', sans-serif;
-overflow-x: hidden;
-color: #ffffff;
-}
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeminiFlix Premium - Ultimate Cinematic Streaming</title>
+    
+    <!-- Tailwind CSS for modern responsive layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#E50914',
+                            darkRed: '#B81D24',
+                            black: '#141414',
+                            cardBg: '#181818',
+                            glass: 'rgba(20, 20, 20, 0.75)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        impact: ['Bebas Neue', 'Impact', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 
-/* STREAMING_CHUNK:Custom scrollbar and banner styling... /
-/ Hide scrollbars for side-scrolling carousels /
-.scrollbar-hide::-webkit-scrollbar {
-display: none;
-}
-.scrollbar-hide {
--ms-overflow-style: none; / IE/Edge /
-scrollbar-width: none; / Firefox */
-}
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-/* Bottom-fade gradient shadow for the hero banner */
-.banner-fade-bottom {
-height: 12rem;
-background-image: linear-gradient(180deg, transparent, rgba(20, 20, 20, 0.6), #141414);
-}
+    <style>
+        body {
+            background-color: #141414;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            color: #ffffff;
+            user-select: none;
+        }
 
-/* STREAMING_CHUNK:Movie card interactions and hover effects... /
-/ Movie card hover zoom effects */
-.movie-card {
-transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease;
-}
-.movie-card:hover {
-transform: scale(1.08);
-z-index: 30;
-box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.9), 0 8px 10px -6px rgba(0, 0, 0, 0.9);
-}
+        /* Hide scrollbars for slick horizontal carousels */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* STREAMING_CHUNK:Glassmorphic header navigation styling... /
-/ Glassmorphic navigation header */
-.glass-nav {
-background-color: rgba(20, 20, 20, 0.0);
-backdrop-filter: blur(0px);
-transition: background-color 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
-}
-.glass-nav.scrolled {
-background-color: rgba(20, 20, 20, 0.95);
-backdrop-filter: blur(12px);
-border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
+        /* Custom glow & gradient fade overlays */
+        .banner-fade-bottom {
+            height: 16rem;
+            background-image: linear-gradient(180deg, transparent 0%, rgba(20,20,20,0.5) 50%, #141414 100%);
+        }
 
-/* STREAMING_CHUNK:Media player aspect ratios and scroll buttons... /
-/ Aspect ratio for the streaming player iframe */
-#modal-video-container {
-aspect-ratio: 16 / 9;
-}
+        /* Signature Netflix-style Top 10 Giant Numbers */
+        .top10-number {
+            font-size: 8.5rem;
+            font-weight: 900;
+            line-height: 0.8;
+            color: #141414;
+            -webkit-text-stroke: 4px #595959;
+            position: absolute;
+            left: -1.75rem;
+            bottom: -0.25rem;
+            z-index: 10;
+            user-select: none;
+            font-family: 'Bebas Neue', 'Impact', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 10px 20px rgba(0,0,0,0.8);
+        }
 
-/* Row carousel navigation arrows */
-.scroll-arrow {
-position: absolute;
-top: 50%;
-transform: translateY(-50%);
-background-color: rgba(0, 0, 0, 0.7);
-color: white;
-border: 1px solid rgba(255, 255, 255, 0.1);
-cursor: pointer;
-z-index: 25;
-opacity: 0;
-transition: opacity 0.3s ease, background-color 0.2s ease, transform 0.2s ease;
-border-radius: 9999px;
-width: 3rem;
-height: 3rem;
-}
+        .movie-card:hover .top10-number {
+            -webkit-text-stroke: 4px #E50914;
+            color: #0d0d0d;
+            transform: scale(1.05) translateY(-4px);
+        }
 
-.scroll-arrow:hover {
-background-color: #E50914;
-transform: translateY(-50%) scale(1.1);
-}
+        /* Movie card zoom & glow physics */
+        .movie-card {
+            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+        }
+        .movie-card:hover {
+            transform: scale(1.08) translateY(-6px);
+            z-index: 40;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.95), 0 0 15px rgba(229, 9, 20, 0.25);
+            border-color: rgba(229, 9, 20, 0.6);
+        }
 
-.row-container:hover .scroll-arrow {
-opacity: 1;
-}
+        /* Glassmorphic sticky header nav */
+        .glass-nav {
+            background-color: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.4s ease;
+        }
+        .glass-nav.scrolled {
+            background-color: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
 
-.scroll-arrow.left {
-left: 0.75rem;
-}
+        /* Glass pill badges */
+        .glass-pill {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .glass-pill:hover, .glass-pill.active {
+            background: #E50914;
+            border-color: #E50914;
+            color: white;
+        }
 
-.scroll-arrow.right {
-right: 0.75rem;
-}
+        /* 16:9 Aspect Ratio container for video frame */
+        .aspect-video-player {
+            aspect-ratio: 16 / 9;
+        }
+
+        /* Carousel Navigation Buttons */
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            z-index: 35;
+            opacity: 0;
+            transition: all 0.25s ease;
+            border-radius: 9999px;
+            width: 3.25rem;
+            height: 3.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .scroll-arrow:hover {
+            background-color: #E50914;
+            transform: translateY(-50%) scale(1.15);
+            box-shadow: 0 0 20px rgba(229, 9, 20, 0.6);
+        }
+        .row-container:hover .scroll-arrow {
+            opacity: 1;
+        }
+        .scroll-arrow.left { left: -0.75rem; }
+        .scroll-arrow.right { right: -0.75rem; }
+
+        /* Smooth Skeleton Pulse Loading */
+        @keyframes pulse-bg {
+            0%, 100% { background-color: rgba(255,255,255,0.05); }
+            50% { background-color: rgba(255,255,255,0.12); }
+        }
+        .skeleton {
+            animation: pulse-bg 1.5s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-white selection:bg-red-600 selection:text-white min-h-screen flex flex-col justify-between">
+
+    <!-- Top Main Header Navigation -->
+    <nav id="navbar" class="glass-nav fixed top-0 left-0 right-0 z-50 px-4 py-3 md:px-12 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-6">
+                    <a href="#" onclick="filterByGenre('all')" class="text-2xl md:text-3xl font-extrabold text-brand-red tracking-wider hover:opacity-90 transition flex items-center gap-2 group">
+                        <i class="fa-solid fa-play-circle text-2xl group-hover:scale-110 transition duration-300"></i>
+                        <span>GEMINIFLIX</span>
+                    </a>
+                    <div class="hidden lg:flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase bg-gradient-to-r from-red-600/30 to-amber-500/20 border border-red-500/30 px-3 py-1 rounded-full text-red-300">
+                        <i class="fa-solid fa-shield-halved text-amber-400 animate-pulse"></i>
+                        <span>PhCorner Elite DevOps Engine</span>
+                    </div>
+                </div>
+
+                <!-- Mobile Header Actions -->
+                <div class="flex items-center gap-3 md:hidden">
+                    <button onclick="toggleAudioFx()" id="mobile-sound-btn" class="p-2 text-zinc-400 hover:text-white text-xs bg-zinc-800/80 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fa-solid fa-volume-xmark" id="mobile-sound-icon"></i>
+                    </button>
+                    <button onclick="toggleLanguage()" class="p-2 text-zinc-300 hover:text-white text-xs bg-zinc-800/80 rounded-full border border-zinc-700/50 w-8 h-8 flex items-center justify-center font-bold">
+                        <span id="mobile-lang-label">EN</span>
+                    </button>
+                    <div onclick="openProfileModal()" class="cursor-pointer relative">
+                        <img id="mobile-profile-avatar" class="h-8 w-8 rounded-md border-2 border-red-600 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Avatar">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Live Search & Right Desktop Options -->
+            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                <div class="relative w-full md:w-72">
+                    <input type="text" id="search-input" placeholder="Search movies, TV shows, actors..." class="w-full bg-zinc-950/90 text-white pl-10 pr-9 py-2 rounded-full text-xs font-medium border border-zinc-700/80 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent transition-all duration-300 shadow-inner">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-zinc-400 text-xs"></i>
+                    <button id="search-clear-btn" onclick="clearSearch()" class="hidden absolute right-3 top-2.5 text-zinc-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                </div>
+
+                <div class="hidden md:flex items-center gap-3">
+                    <button onclick="toggleAudioFx()" id="desktop-sound-btn" title="Toggle UI Sound Effects" class="text-xs font-semibold p-2 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/50 rounded-full transition w-8 h-8 flex items-center justify-center">
+                        <i class="fa-solid fa-volume-xmark text-red-500" id="desktop-sound-icon"></i>
+                    </button>
+
+                    <button id="nav-watchlist-btn" onclick="filterByGenre('watchlist')" class="text-xs font-semibold px-3.5 py-1.5 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-200 border border-zinc-700/50 rounded-full flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-bookmark text-brand-red"></i>
+                        <span data-translate="myList">My List</span>
+                        <span id="watchlist-count-badge" class="bg-brand-red text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold ml-0.5">0</span>
+                    </button>
+
+                    <button onclick="toggleLanguage()" class="text-xs font-semibold px-3 py-1.5 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-200 border border-zinc-700/50 rounded-full flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-globe text-brand-red"></i>
+                        <span id="lang-label">EN</span>
+                    </button>
+
+                    <!-- Profile Switcher Button -->
+                    <div onclick="openProfileModal()" class="cursor-pointer relative group flex items-center gap-2 bg-zinc-900/90 border border-zinc-800 p-1 pr-3 rounded-full hover:border-red-600 transition">
+                        <img id="desktop-profile-avatar" class="h-8 w-8 rounded-full border border-red-600 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Profile">
+                        <span id="desktop-profile-name" class="text-xs font-extrabold text-zinc-200">Damn-YankeeS</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-zinc-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Interactive Sticky Genre Pills Bar -->
+    <section class="mt-24 md:mt-20 max-w-7xl mx-auto px-4 md:px-12 w-full z-40 relative">
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide py-2 border-b border-zinc-800/60">
+            <span class="text-xs font-bold text-zinc-400 uppercase tracking-widest mr-2 flex items-center gap-1">
+                <i class="fa-solid fa-sliders text-brand-red"></i> Categories:
+            </span>
+            <button onclick="filterByGenre('all')" class="genre-pill glass-pill active text-xs font-extrabold px-4 py-1.5 rounded-full transition shrink-0" data-genre="all">
+                All Catalog
+            </button>
+            <button onclick="filterByGenre('movie')" class="genre-pill glass-pill text-xs font-bold px-4 py-1.5 rounded-full transition shrink-0" data-genre="movie">
+                <i class="fa-solid fa-film mr-1"></i> Blockbuster Movies
+            </button>
+            <button onclick="filterByGenre('tv')" class="genre-pill glass-pill text-xs font-bold px-4 py-1.5 rounded-full transition shrink-0" data-genre="tv">
+                <i class="fa-solid fa-tv mr-1"></i> TV Series
+            </button>
+            <button onclick="filterByGenre('action')" class="genre-pill glass-pill text-xs font-bold px-4 py-1.5 rounded-full transition shrink-0" data-genre="action">
+                🔥 Action & Sci-Fi
+            </button>
+            <button onclick="filterByGenre('horror')" class="genre-pill glass-pill text-xs font-bold px-4 py-1.5 rounded-full transition shrink-0" data-genre="horror">
+                👻 Horror & Thriller
+            </button>
+            <button onclick="filterByGenre('top_rated')" class="genre-pill glass-pill text-xs font-bold px-4 py-1.5 rounded-full transition shrink-0" data-genre="top_rated">
+                ⭐ Top Rated
+            </button>
+            <button onclick="filterByGenre('watchlist')" class="genre-pill glass-pill text-xs font-bold px-4 py-1.5 rounded-full transition shrink-0" data-genre="watchlist">
+                <i class="fa-solid fa-bookmark text-brand-red mr-1"></i> My Watchlist
+            </button>
+        </div>
+    </section>
+
+    <!-- Hero Spotlight Header Carousel -->
+    <header id="banner" class="relative text-white bg-cover bg-center flex items-end min-h-[72vh] md:min-h-[85vh] transition-all duration-700 mt-2">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#141414] via-black/40 to-black/70 z-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#141414] via-black/50 to-transparent z-10"></div>
+
+        <div class="relative max-w-7xl mx-auto w-full px-4 md:px-12 pb-16 z-20">
+            <!-- Badges and Quality Tags -->
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+                <span class="px-3 py-1 bg-brand-red text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5">
+                    <i class="fa-solid fa-crown text-amber-300"></i> Spotlight Premiere
+                </span>
+                <span id="hero-match-badge" class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded text-[10px] font-bold">
+                    98% Match
+                </span>
+                <span id="hero-rating-badge" class="px-2 py-0.5 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded text-[10px] font-extrabold">
+                    TV-MA
+                </span>
+                <span class="px-2 py-0.5 bg-zinc-800/80 text-amber-400 border border-zinc-700 rounded text-[10px] font-extrabold flex items-center gap-1">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> 4K ULTRA HD
+                </span>
+                <span class="px-2 py-0.5 bg-zinc-800/80 text-zinc-300 border border-zinc-700 rounded text-[10px] font-extrabold">
+                    Spatial Audio
+                </span>
+            </div>
+
+            <h1 id="banner-title" class="text-3xl md:text-6xl font-black pb-3 tracking-tight leading-none drop-shadow-2xl max-w-3xl">
+                Loading Featured Stream...
+            </h1>
+
+            <p id="banner-description" class="w-full md:max-w-2xl text-xs md:text-sm text-zinc-300 font-medium leading-relaxed drop-shadow h-16 overflow-hidden line-clamp-3 mb-6">
+                Discover trending movies, high-definition series, and live titles powered by GeminiFlix Premium engine.
+            </p>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <button id="banner-play-btn" class="bg-brand-red hover:bg-red-700 text-white font-extrabold rounded-xl px-8 py-3.5 active:scale-95 transition-all text-sm md:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-red-900/30">
+                    <i class="fa-solid fa-play text-lg"></i> <span data-translate="play">Play Stream</span>
+                </button>
+                <button id="banner-info-btn" class="bg-zinc-800/90 hover:bg-zinc-700/90 text-white font-extrabold rounded-xl px-7 py-3.5 active:scale-95 transition-all text-sm md:text-base border border-zinc-700/80 flex items-center justify-center gap-2 backdrop-blur-md">
+                    <i class="fa-solid fa-circle-info text-lg text-zinc-400"></i> <span data-translate="moreInfo">More Info</span>
+                </button>
+                <button id="banner-watchlist-btn" class="bg-zinc-900/80 hover:bg-zinc-800 text-zinc-200 p-3.5 rounded-xl border border-zinc-700/60 active:scale-95 transition flex items-center justify-center">
+                    <i class="fa-solid fa-plus text-base text-red-500" id="banner-watchlist-icon"></i>
+                </button>
+            </div>
+
+            <!-- Spotlight Carousel Indicators -->
+            <div id="hero-carousel-dots" class="flex items-center gap-2 mt-8">
+                <!-- Dynamic dots -->
+            </div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 banner-fade-bottom"></div>
+    </header>
+
+    <!-- Main Content Catalog -->
+    <main class="max-w-7xl mx-auto px-4 md:px-12 pb-24 relative -mt-10 z-30 w-full flex-grow">
+
+        <!-- Live Real-Time Search Results Overlay Row -->
+        <section id="search-row-container" class="hidden mb-12 bg-zinc-900/90 p-6 rounded-2xl border border-zinc-800 shadow-2xl backdrop-blur-md">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl md:text-2xl font-extrabold tracking-tight text-brand-red flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass"></i> <span data-translate="searchResults">Search Results</span>
+                </h2>
+                <button onclick="clearSearch()" class="text-xs text-zinc-400 hover:text-white transition bg-zinc-800 px-3 py-1 rounded-full">
+                    Clear Search <i class="fa-solid fa-xmark ml-1"></i>
+                </button>
+            </div>
+            <div class="relative row-container">
+                <div id="search-results-row" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- Dynamic search cards -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Continue Watching Dynamic Row -->
+        <section id="continue-watching-container" class="hidden mb-12">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg md:text-xl font-black tracking-wide text-zinc-100 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-brand-red rounded-full inline-block"></span>
+                    <span>Continue Watching</span>
+                </h2>
+                <span class="text-xs text-zinc-400 font-semibold">Saved Progress</span>
+            </div>
+            <div class="relative row-container">
+                <div id="continue-watching-row" class="flex overflow-y-hidden overflow-x-scroll py-4 px-1 -ml-1 scrollbar-hide gap-4">
+                    <!-- Dynamic continue watching cards -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Signature TOP 10 Movies & TV Shows Today Row -->
+        <section id="top10-container" class="mb-12 relative">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xl md:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                    <span class="w-2 h-6 bg-brand-red rounded-full inline-block"></span>
+                    <span>Top 10 Today in Philippines</span>
+                    <span class="bg-red-600/20 text-red-500 border border-red-500/30 text-[10px] font-black px-2 py-0.5 rounded uppercase">Trending</span>
+                </h2>
+            </div>
+            <div class="relative row-container group">
+                <div id="top10-row" class="flex overflow-y-hidden overflow-x-scroll py-6 px-4 -ml-2 scrollbar-hide gap-8 scroll-smooth">
+                    <!-- Top 10 Dynamic Cards with Giant Numbers stacked behind -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Watchlist Filtered Grid Section -->
+        <section id="watchlist-row-container" class="hidden mb-12">
+            <h2 class="text-xl md:text-2xl font-black tracking-tight mb-4 text-brand-red flex items-center gap-2">
+                <i class="fa-solid fa-bookmark"></i> <span data-translate="myList">My Watchlist</span>
+            </h2>
+            <div id="watchlist-empty-msg" class="hidden text-center py-12 bg-zinc-900/50 rounded-2xl border border-zinc-800">
+                <i class="fa-solid fa-bookmark text-4xl text-zinc-700 mb-3"></i>
+                <p class="text-zinc-400 font-bold text-sm">Your watchlist is currently empty.</p>
+                <p class="text-zinc-600 text-xs mt-1">Click "+ My List" on any movie or TV series to add it here.</p>
+            </div>
+            <div class="relative row-container">
+                <div id="watchlist-row" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- Dynamic watchlist cards -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Category Content Rows injected here -->
+        <div id="movie-rows" class="space-y-10">
+            <!-- Dynamic Movie & Series rows -->
+        </div>
+    </main>
+
+    <!-- Video Player & Metadata Modal -->
+    <div id="modal-overlay" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center z-50 p-2 md:p-6 transition-all duration-300 opacity-0">
+        <div id="modal-container" class="relative bg-zinc-900 w-full max-w-5xl rounded-2xl shadow-2xl border border-zinc-800 overflow-hidden transform scale-95 transition-all duration-300 flex flex-col max-h-[92vh]">
+            
+            <!-- Close Trigger -->
+            <button id="modal-close-btn" class="absolute top-3 right-3 text-white bg-black/80 backdrop-blur-md rounded-full h-10 w-10 flex items-center justify-center z-40 hover:bg-brand-red hover:scale-110 transition duration-200 border border-zinc-700/80 shadow-2xl">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <!-- Media Player Viewport -->
+            <div id="modal-video-container" class="w-full bg-black relative aspect-video-player shrink-0">
+                <iframe id="embed-player" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+                
+                <div id="player-loading-spinner" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 z-20">
+                    <div class="w-12 h-12 border-4 border-brand-red border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <p class="text-xs font-bold text-zinc-400">Connecting to High-Speed Stream Server...</p>
+                </div>
+            </div>
+
+            <!-- Player Control Toolbar & Server Switcher -->
+            <div class="bg-zinc-950 px-4 md:px-6 py-3 flex flex-wrap gap-2 items-center justify-between border-b border-zinc-800 shrink-0">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-[11px] font-extrabold text-zinc-400 mr-1 uppercase tracking-wider"><i class="fa-solid fa-server text-brand-red"></i> Stream Source:</span>
+                    <button onclick="switchStreamServer('vidsrc')" class="server-btn px-3 py-1 rounded-md text-[11px] font-extrabold bg-brand-red text-white transition shadow">
+                        Server 1 (Primary)
+                    </button>
+                    <button onclick="switchStreamServer('autoembed')" class="server-btn px-3 py-1 rounded-md text-[11px] font-extrabold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition">
+                        Server 2 (Backup)
+                    </button>
+                    <button onclick="switchStreamServer('embedsu')" class="server-btn px-3 py-1 rounded-md text-[11px] font-extrabold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition">
+                        Server 3 (HD Fast)
+                    </button>
+                    <button onclick="switchStreamServer('trailer')" class="server-btn px-3 py-1 rounded-md text-[11px] font-extrabold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition">
+                        <i class="fa-solid fa-film"></i> Trailer
+                    </button>
+                </div>
+                
+                <div id="stream-server-info" class="text-[11px] text-emerald-400 flex items-center gap-2 font-bold">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>1080p Ultra HD • 60FPS Stream Active</span>
+                </div>
+            </div>
+
+            <!-- TV Series Season & Episode Picker Grid -->
+            <div id="tv-episode-selector" class="hidden bg-zinc-900 px-4 md:px-6 py-3 border-b border-zinc-800/80 shrink-0">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-black text-brand-red uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-list-ol"></i> Episodes:
+                        </span>
+                        <select id="tv-season-select" class="bg-zinc-950 text-white border border-zinc-700 rounded-lg px-3 py-1.5 text-xs font-extrabold focus:outline-none focus:ring-1 focus:ring-brand-red">
+                            <!-- Dynamic season options -->
+                        </select>
+                    </div>
+                    <div id="episodes-pill-grid" class="flex gap-1.5 overflow-x-auto scrollbar-hide py-1 max-w-full">
+                        <!-- Dynamic episode pills -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Overview Content Body -->
+            <div id="modal-details" class="p-4 md:p-6 space-y-4 overflow-y-auto scrollbar-hide grow">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+                    <div>
+                        <h2 id="modal-title" class="text-2xl md:text-3xl font-extrabold tracking-tight">Loading Title...</h2>
+                        <div class="flex flex-wrap items-center gap-3 text-xs font-semibold text-zinc-400 mt-2">
+                            <span id="modal-rating" class="text-amber-400 font-bold flex items-center"></span>
+                            <span id="modal-release-date" class="bg-zinc-800 px-2.5 py-0.5 rounded text-zinc-300"></span>
+                            <span id="modal-type" class="bg-zinc-800 px-2.5 py-0.5 rounded text-brand-red font-bold"></span>
+                            <span class="text-emerald-400 font-bold">98% Match</span>
+                            <span class="border border-zinc-700 px-1.5 py-0.2 rounded text-[10px]">HD</span>
+                            <span class="border border-zinc-700 px-1.5 py-0.2 rounded text-[10px]">5.1</span>
+                        </div>
+                    </div>
+                    
+                    <button id="modal-watchlist-btn" class="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 transition flex items-center gap-2 shrink-0 self-start sm:self-center shadow">
+                        <i id="modal-watchlist-icon" class="fa-solid fa-plus text-brand-red"></i>
+                        <span id="modal-watchlist-text" data-translate="myList">My Watchlist</span>
+                    </button>
+                </div>
+
+                <p id="modal-description" class="text-xs md:text-sm leading-relaxed text-zinc-300 font-normal"></p>
+
+                <!-- Cast & Recommendation Highlights -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="bg-zinc-950/60 p-3.5 rounded-xl border border-zinc-800/80">
+                        <h4 class="text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-2">Cast & Production:</h4>
+                        <p id="modal-cast-list" class="text-xs text-zinc-300">Featured Starring Cast, Directors, PhCorner DevOps Production</p>
+                    </div>
+                    <div class="bg-zinc-950/60 p-3.5 rounded-xl border border-zinc-800/80">
+                        <h4 class="text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-2">Stream Features:</h4>
+                        <div class="flex flex-wrap gap-2 text-[11px] text-zinc-300 font-medium">
+                            <span class="px-2 py-1 bg-zinc-800 rounded flex items-center gap-1"><i class="fa-solid fa-check text-emerald-400"></i> Zero Ads</span>
+                            <span class="px-2 py-1 bg-zinc-800 rounded flex items-center gap-1"><i class="fa-solid fa-check text-emerald-400"></i> Multi-Language Subtitles</span>
+                            <span class="px-2 py-1 bg-zinc-800 rounded flex items-center gap-1"><i class="fa-solid fa-check text-emerald-400"></i> Fast CDN Embed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Selection Modal -->
+    <div id="profile-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all duration-300">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl relative">
+            <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <h3 class="text-xl font-black text-white mb-1">Who's Watching?</h3>
+            <p class="text-xs text-zinc-400 mb-6">Select your profile to customize watchlist and layout preferences.</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div onclick="selectProfile('Damn-YankeeS', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80')" class="cursor-pointer bg-zinc-950 p-4 rounded-xl border border-red-600/60 hover:border-red-600 hover:scale-105 transition flex flex-col items-center">
+                    <img class="w-16 h-16 rounded-full border-2 border-red-600 object-cover mb-2" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="DevOps">
+                    <span class="text-xs font-black text-white">Damn-YankeeS</span>
+                    <span class="text-[9px] text-amber-400 font-bold uppercase mt-0.5">VIP Dev Pass</span>
+                </div>
+
+                <div onclick="selectProfile('PhCorner Guest', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80')" class="cursor-pointer bg-zinc-950 p-4 rounded-xl border border-zinc-800 hover:border-red-600 hover:scale-105 transition flex flex-col items-center">
+                    <img class="w-16 h-16 rounded-full border-2 border-zinc-700 object-cover mb-2" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Guest">
+                    <span class="text-xs font-black text-white">PhCorner Guest</span>
+                    <span class="text-[9px] text-zinc-400 font-bold uppercase mt-0.5">Standard HD</span>
+                </div>
+            </div>
+
+            <button onclick="closeProfileModal()" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-xs font-extrabold text-zinc-300">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Global Floating Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-500 bg-brand-red text-white font-extrabold px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-red-500/50">
+        <i class="fa-solid fa-bell text-amber-300 text-base"></i>
+        <span id="toast-message" class="text-xs">Notification message</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-zinc-950 border-t border-zinc-900/80 py-10 px-6 text-center text-xs text-zinc-500">
+        <div class="max-w-7xl mx-auto flex flex-col items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-brand-red font-black text-lg">
+                <i class="fa-solid fa-play-circle"></i> GEMINIFLIX PREMIUM
+            </div>
+            <p class="max-w-md text-zinc-500 text-[11px] leading-relaxed">
+                Powered by GeminiFlix DevOps Engine. High-fidelity cinematic stream UI built exclusively for PhCorner Elites & Damn-YankeeS.
+            </p>
+            <p class="text-[10px] text-zinc-600">© 2026 GeminiFlix. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Core Configuration & API Constants
+        const API_KEY = '0df126d14bdf9c91c1cd3cd84b819db6';
+        const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500/';
+        const IMAGE_ORIGINAL_URL = 'https://image.tmdb.org/t/p/original/';
+
+        // Fallback Catalog ensuring robust performance if API rate limits or network issues occur
+        const FALLBACK_MOVIES = [
+            {
+                id: 157336,
+                title: "Interstellar",
+                name: "Interstellar",
+                overview: "The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.",
+                poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+                backdrop_path: "/xJHokMbljvjADYdit5fK1DV3A2.jpg",
+                vote_average: 8.6,
+                release_date: "2014-11-05",
+                media_type: "movie",
+                youtube_key: "zSWdZVtXT7E",
+                genre_ids: [28, 878]
+            },
+            {
+                id: 550,
+                title: "Fight Club",
+                name: "Fight Club",
+                overview: "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more.",
+                poster_path: "/pB8BM7PDSp6B6Ih7QIp4G33L3L7.jpg",
+                backdrop_path: "/hZk239A32d3A3G313a3G3a.jpg",
+                vote_average: 8.4,
+                release_date: "1999-10-15",
+                media_type: "movie",
+                youtube_key: "qtRKDV93s2s",
+                genre_ids: [28, 18]
+            },
+            {
+                id: 27205,
+                title: "Inception",
+                name: "Inception",
+                overview: "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets, is offered a chance to regain his old life in exchange for inception.",
+                poster_path: "/oYu23218218.jpg",
+                backdrop_path: "/s3T1313.jpg",
+                vote_average: 8.4,
+                release_date: "2010-07-15",
+                media_type: "movie",
+                youtube_key: "YoHD9XEInc0",
+                genre_ids: [28, 878]
+            },
+            {
+                id: 299536,
+                title: "Avengers: Infinity War",
+                name: "Avengers: Infinity War",
+                overview: "As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos.",
+                poster_path: "/7WsyChLLEP32A3218.jpg",
+                backdrop_path: "/lmCh3218218.jpg",
+                vote_average: 8.3,
+                release_date: "2018-04-25",
+                media_type: "movie",
+                youtube_key: "6ZfuNTqbHE8",
+                genre_ids: [28, 12]
+            },
+            {
+                id: 1396,
+                title: "Breaking Bad",
+                name: "Breaking Bad",
+                overview: "Walter White, a New Mexico chemistry teacher, is diagnosed with Stage III cancer and given a prognosis of two years left to live. He chooses to enter the world of drugs and crime.",
+                poster_path: "/ggFH1313.jpg",
+                backdrop_path: "/tsRy3218218.jpg",
+                vote_average: 8.9,
+                release_date: "2008-01-20",
+                media_type: "tv",
+                seasons: [{ season_number: 1, episode_count: 7 }, { season_number: 2, episode_count: 13 }, { season_number: 3, episode_count: 13 }],
+                youtube_key: "HhesaQXLuRY",
+                genre_ids: [18, 80]
+            },
+            {
+                id: 66732,
+                title: "Stranger Things",
+                name: "Stranger Things",
+                overview: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.",
+                poster_path: "/49WJfeN313.jpg",
+                backdrop_path: "/56v2313.jpg",
+                vote_average: 8.6,
+                release_date: "2016-07-15",
+                media_type: "tv",
+                seasons: [{ season_number: 1, episode_count: 8 }, { season_number: 2, episode_count: 9 }, { season_number: 3, episode_count: 8 }],
+                youtube_key: "b9EkMc79ZSU",
+                genre_ids: [10765, 18]
+            },
+            {
+                id: 872585,
+                title: "Oppenheimer",
+                name: "Oppenheimer",
+                overview: "The story of J. Robert Oppenheimer's role in the development of the atomic bomb during World War II.",
+                poster_path: "/8Gxv8gSFCU0XGDykEGv3C3O33m.jpg",
+                backdrop_path: "/fm6K3P9323.jpg",
+                vote_average: 8.1,
+                release_date: "2023-07-19",
+                media_type: "movie",
+                youtube_key: "uYPbbksJxIg",
+                genre_ids: [18, 36]
+            },
+            {
+                id: 693134,
+                title: "Dune: Part Two",
+                name: "Dune: Part Two",
+                overview: "Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family.",
+                poster_path: "/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
+                backdrop_path: "/xOMo8BRK7PfcJv9312.jpg",
+                vote_average: 8.3,
+                release_date: "2024-02-27",
+                media_type: "movie",
+                youtube_key: "Way9Dexny3w",
+                genre_ids: [28, 878]
+            }
+        ];
+
+        // State Machine Variables
+        let currentLanguage = localStorage.getItem('gflix_lang') || 'en';
+        let watchlist = JSON.parse(localStorage.getItem('gflix_watchlist')) || [];
+        let continueWatching = JSON.parse(localStorage.getItem('gflix_continue')) || [];
+        let activeProfile = JSON.parse(localStorage.getItem('gflix_profile')) || { name: 'Damn-YankeeS', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80' };
+        
+        let audioFxEnabled = false;
+        let audioCtx = null;
+        let currentHeroIndex = 0;
+        let heroCarouselTimer = null;
+        let heroCatalog = [];
+
+        let currentActiveModalMedia = null;
+        let currentActiveMediaType = 'movie';
+        let currentActiveServer = 'vidsrc';
+        let currentSelectedSeason = 1;
+        let currentSelectedEpisode = 1;
+
+        // Multilingual Dictionary
+        const translations = {
+            en: {
+                myList: "My Watchlist",
+                play: "Play Stream",
+                moreInfo: "More Info",
+                searchResults: "Search Results",
+                noTrailer: "Trailer loading...",
+                searchPlaceholder: "Search movies, TV shows, actors...",
+                addedToList: "Added to My Watchlist!",
+                removedFromList: "Removed from My Watchlist!",
+                trendingNow: "Trending Blockbusters",
+                topRated: "Top Rated Movies",
+                actionMovies: "Action & Sci-Fi Thrillers",
+                tvShows: "Popular TV Series",
+                horrorMovies: "Horror & Chilling Gems"
+            },
+            tl: {
+                myList: "Aking Listahan",
+                play: "I-stream Ngayon",
+                moreInfo: "Impormasyon",
+                searchResults: "Resulta ng Paghahanap",
+                noTrailer: "Naglo-load ang trailer...",
+                searchPlaceholder: "Maghanap ng pelikula o palabas...",
+                addedToList: "Naidagdag sa Aking Listahan!",
+                removedFromList: "Inalis sa Aking Listahan!",
+                trendingNow: "Sikat na Pelikula",
+                topRated: "Mataas ang Marka",
+                actionMovies: "Aksyon at Sci-Fi",
+                tvShows: "Sikat na Serye sa TV",
+                horrorMovies: "Horror at Takutan"
+            }
+        };
+
+        // Web Audio API Synthesizer for UI sound effects (Zero external files)
+        function playSynthesizedSound(type) {
+            if (!audioFxEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'hover') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.04);
+                }
+            } catch (e) {}
+        }
+
+        function toggleAudioFx() {
+            audioFxEnabled = !audioFxEnabled;
+            const desktopIcon = document.getElementById('desktop-sound-icon');
+            const mobileIcon = document.getElementById('mobile-sound-icon');
+            
+            if (audioFxEnabled) {
+                desktopIcon.className = "fa-solid fa-volume-high text-emerald-400";
+                mobileIcon.className = "fa-solid fa-volume-high text-emerald-400";
+                showToast("UI Audio Effects Enabled");
+                playSynthesizedSound('click');
+            } else {
+                desktopIcon.className = "fa-solid fa-volume-xmark text-red-500";
+                mobileIcon.className = "fa-solid fa-volume-xmark text-red-500";
+                showToast("UI Audio Effects Muted");
+            }
+        }
+
+        function showToast(message) {
+            const toastEl = document.getElementById('toast');
+            const toastMessageEl = document.getElementById('toast-message');
+            toastMessageEl.textContent = message;
+            toastEl.classList.remove('translate-y-24', 'opacity-0');
+            toastEl.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toastEl.classList.add('translate-y-24', 'opacity-0');
+                toastEl.classList.remove('translate-y-0', 'opacity-100');
+            }, 3200);
+        }
+
+        async function fetchData(endpoint) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const response = await fetch(`https://api.themoviedb.org/3${endpoint}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error('Network error');
+                const data = await response.json();
+                return (data.results && data.results.length > 0) ? data.results : FALLBACK_MOVIES;
+            } catch (error) {
+                return FALLBACK_MOVIES;
+            }
+        }
+
+        async function fetchMovieDetails(movieId, mediaType) {
+            const type = mediaType === 'tv' ? 'tv' : 'movie';
+            try {
+                const url = `https://api.themoviedb.org/3/${type}/${movieId}?api_key=${API_KEY}&language=en-US&append_to_response=videos,credits`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Metadata error');
+                return await response.json();
+            } catch (error) {
+                return FALLBACK_MOVIES.find(m => m.id == movieId) || FALLBACK_MOVIES[0];
+            }
+        }
+
+        function renderTop10Row(movies) {
+            const rowContainer = document.getElementById('top10-row');
+            rowContainer.innerHTML = '';
+
+            const top10List = movies.slice(0, 10);
+            top10List.forEach((movie, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex-shrink-0 relative cursor-pointer movie-card rounded-2xl border border-zinc-800 bg-zinc-950 w-36 md:w-52 h-56 md:h-80 my-2 shadow-2xl overflow-visible';
+
+                // Stacked giant number behind card
+                const numDisplay = document.createElement('div');
+                numDisplay.className = 'top10-number';
+                numDisplay.textContent = index + 1;
+
+                const cardInner = document.createElement('div');
+                cardInner.className = 'w-full h-full rounded-2xl overflow-hidden relative z-20 bg-zinc-950';
+
+                const poster = document.createElement('img');
+                const imagePath = movie.poster_path || movie.backdrop_path;
+                poster.src = imagePath ? (imagePath.startsWith('http') ? imagePath : `${IMAGE_BASE_URL}${imagePath}`) : `https://placehold.co/400x600/141414/FFFFFF?text=${encodeURIComponent(movie.title || movie.name)}`;
+                poster.alt = movie.title || movie.name;
+                poster.className = 'w-full h-full object-cover';
+                poster.loading = 'lazy';
+
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-3';
+                overlay.innerHTML = `
+                    <div class="text-xs w-full">
+                        <p class="font-extrabold text-white truncate">${movie.title || movie.name}</p>
+                        <div class="flex items-center justify-between mt-1">
+                            <span class="text-amber-400 font-bold text-[10px]"><i class="fa-solid fa-star mr-1"></i>${movie.vote_average ? movie.vote_average.toFixed(1) : '8.5'}</span>
+                            <span class="bg-brand-red text-white text-[9px] font-black px-2 py-0.5 rounded uppercase">Top #${index + 1}</span>
+                        </div>
+                    </div>
+                `;
+
+                wrapper.dataset.movieId = movie.id;
+                wrapper.dataset.mediaType = movie.media_type || 'movie';
+                wrapper.addEventListener('mouseenter', () => playSynthesizedSound('hover'));
+                wrapper.addEventListener('click', handleMovieCardClick);
+
+                cardInner.appendChild(poster);
+                cardInner.appendChild(overlay);
+                wrapper.appendChild(numDisplay);
+                wrapper.appendChild(cardInner);
+                rowContainer.appendChild(wrapper);
+            });
+        }
+
+        function createStandardMovieRow(title, movies, isLargeRow = false) {
+            const container = document.getElementById('movie-rows');
+            const row = document.createElement('section');
+            row.className = 'relative my-8';
+
+            const rowHeader = document.createElement('div');
+            rowHeader.className = 'flex items-center justify-between mb-3';
+            rowHeader.innerHTML = `
+                <h3 class="text-lg md:text-xl font-extrabold tracking-wide text-zinc-100 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-brand-red rounded-full inline-block"></span>${title}
+                </h3>
+            `;
+            row.appendChild(rowHeader);
+
+            const rowContainer = document.createElement('div');
+            rowContainer.className = 'relative row-container group';
+            row.appendChild(rowContainer);
+
+            const postersContainer = document.createElement('div');
+            postersContainer.className = 'flex overflow-y-hidden overflow-x-scroll py-4 px-1 -ml-1 scrollbar-hide gap-3.5 scroll-smooth';
+            rowContainer.appendChild(postersContainer);
+
+            movies.forEach(movie => {
+                const imagePath = isLargeRow ? movie.poster_path : (movie.backdrop_path || movie.poster_path);
+                if (!imagePath) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = `flex-shrink-0 relative cursor-pointer movie-card rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-950 ${isLargeRow ? 'w-36 md:w-48 h-56 md:h-72' : 'w-52 md:w-72 h-32 md:h-44'}`;
+
+                const poster = document.createElement('img');
+                poster.src = imagePath.startsWith('http') ? imagePath : `${IMAGE_BASE_URL}${imagePath}`;
+                poster.alt = movie.name || movie.title;
+                poster.loading = 'lazy';
+                poster.className = 'w-full h-full object-cover';
+
+                wrapper.dataset.movieId = movie.id;
+                wrapper.dataset.mediaType = movie.media_type || (isLargeRow ? 'tv' : 'movie');
+                wrapper.addEventListener('mouseenter', () => playSynthesizedSound('hover'));
+                wrapper.addEventListener('click', handleMovieCardClick);
+
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-3';
+                overlay.innerHTML = `
+                    <div class="text-[11px] w-full">
+                        <p class="font-extrabold text-white truncate">${movie.name || movie.title}</p>
+                        <div class="flex items-center justify-between mt-1">
+                            <span class="text-amber-400 font-bold text-[10px]"><i class="fa-solid fa-star mr-1"></i>${movie.vote_average ? movie.vote_average.toFixed(1) : '8.4'}</span>
+                            <span class="bg-brand-red text-white text-[9px] font-black px-2 py-0.5 rounded uppercase">Stream</span>
+                        </div>
+                    </div>
+                `;
+
+                wrapper.appendChild(poster);
+                wrapper.appendChild(overlay);
+                postersContainer.appendChild(wrapper);
+            });
+
+            // Side Carousel Arrows
+            const leftArrow = document.createElement('button');
+            leftArrow.className = 'scroll-arrow left hidden md:flex';
+            leftArrow.innerHTML = '<i class="fa-solid fa-chevron-left text-sm"></i>';
+            leftArrow.onclick = () => { postersContainer.scrollBy({ left: -window.innerWidth * 0.6, behavior: 'smooth' }); };
+            rowContainer.appendChild(leftArrow);
+
+            const rightArrow = document.createElement('button');
+            rightArrow.className = 'scroll-arrow right hidden md:flex';
+            rightArrow.innerHTML = '<i class="fa-solid fa-chevron-right text-sm"></i>';
+            rightArrow.onclick = () => { postersContainer.scrollBy({ left: window.innerWidth * 0.6, behavior: 'smooth' }); };
+            rowContainer.appendChild(rightArrow);
+
+            container.appendChild(row);
+        }
+
+        async function handleMovieCardClick(event) {
+            playSynthesizedSound('click');
+            const target = event.currentTarget;
+            const { movieId, mediaType } = target.dataset;
+            if (!movieId) return;
+
+            const details = await fetchMovieDetails(movieId, mediaType);
+            if (details) {
+                saveToContinueWatching(details, mediaType || 'movie');
+                openStreamModal(details, mediaType || 'movie');
+            }
+        }
+
+        function saveToContinueWatching(item, type) {
+            const existingIndex = continueWatching.findIndex(i => i.id == item.id);
+            const entry = {
+                id: item.id,
+                title: item.title || item.name,
+                poster_path: item.poster_path,
+                backdrop_path: item.backdrop_path,
+                media_type: type,
+                progress: Math.floor(Math.random() * 60) + 20 // Simulated playback percentage
+            };
+
+            if (existingIndex > -1) {
+                continueWatching.splice(existingIndex, 1);
+            }
+            continueWatching.unshift(entry);
+            if (continueWatching.length > 8) continueWatching.pop();
+
+            localStorage.setItem('gflix_continue', JSON.stringify(continueWatching));
+            renderContinueWatchingRow();
+        }
+
+        function renderContinueWatchingRow() {
+            const container = document.getElementById('continue-watching-container');
+            const row = document.getElementById('continue-watching-row');
+            row.innerHTML = '';
+
+            if (continueWatching.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+
+            continueWatching.forEach(item => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex-shrink-0 relative cursor-pointer movie-card rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 w-48 md:w-60 h-28 md:h-36';
+
+                const poster = document.createElement('img');
+                const imgPath = item.backdrop_path || item.poster_path;
+                poster.src = imgPath ? (imgPath.startsWith('http') ? imgPath : `${IMAGE_BASE_URL}${imgPath}`) : 'https://placehold.co/400x250/141414/FFFFFF?text=Stream';
+                poster.className = 'w-full h-full object-cover';
+
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent flex flex-col justify-between p-2.5';
+                overlay.innerHTML = `
+                    <div class="flex justify-end">
+                        <span class="bg-brand-red text-white text-[8px] font-black px-1.5 py-0.5 rounded"><i class="fa-solid fa-play mr-1"></i>Resume</span>
+                    </div>
+                    <div>
+                        <p class="font-extrabold text-white text-xs truncate">${item.title}</p>
+                        <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-1.5">
+                            <div class="bg-brand-red h-full rounded-full" style="width: ${item.progress}%"></div>
+                        </div>
+                    </div>
+                `;
+
+                wrapper.dataset.movieId = item.id;
+                wrapper.dataset.mediaType = item.media_type;
+                wrapper.addEventListener('click', handleMovieCardClick);
+
+                wrapper.appendChild(poster);
+                wrapper.appendChild(overlay);
+                row.appendChild(wrapper);
+            });
+        }
+
+        function openStreamModal(details, type) {
+            currentActiveModalMedia = details;
+            currentActiveMediaType = type;
+            currentActiveServer = 'vidsrc';
+            currentSelectedSeason = 1;
+            currentSelectedEpisode = 1;
+
+            document.getElementById('modal-title').textContent = details.name || details.title || "Featured Title";
+            document.getElementById('modal-description').textContent = details.overview || "Watch this blockbuster live on GeminiFlix Premium high-speed server.";
+            document.getElementById('modal-rating').innerHTML = `<i class="fa-solid fa-star text-amber-400 mr-1"></i> ${details.vote_average ? details.vote_average.toFixed(1) : '8.5'}`;
+            document.getElementById('modal-release-date').textContent = `Release: ${details.release_date || details.first_air_date || '2024'}`;
+            document.getElementById('modal-type').textContent = type === 'tv' ? 'TV Series' : 'Blockbuster Movie';
+
+            // Cast string
+            const cast = details.credits?.cast?.slice(0, 5).map(c => c.name).join(', ') || 'Cillian Murphy, Christopher Nolan, Damn-YankeeS';
+            document.getElementById('modal-cast-list').textContent = cast;
+
+            updateWatchlistModalButtonUI();
+
+            const tvSelector = document.getElementById('tv-episode-selector');
+            if (type === 'tv') {
+                tvSelector.classList.remove('hidden');
+                setupTvEpisodesGrid(details);
+            } else {
+                tvSelector.classList.add('hidden');
+            }
+
+            updateModalEmbedPlayer();
+
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalContainer = document.getElementById('modal-container');
+            modalOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                modalOverlay.classList.remove('opacity-0');
+                modalContainer.classList.remove('scale-95');
+                modalContainer.classList.add('scale-100');
+            }, 50);
+        }
+
+        function setupTvEpisodesGrid(details) {
+            const seasonSelect = document.getElementById('tv-season-select');
+            const pillsGrid = document.getElementById('episodes-pill-grid');
+            seasonSelect.innerHTML = '';
+            pillsGrid.innerHTML = '';
+
+            const seasons = details.seasons || [{ season_number: 1, episode_count: 10 }];
+
+            seasons.filter(s => s.season_number > 0).forEach(season => {
+                const opt = document.createElement('option');
+                opt.value = season.season_number;
+                opt.textContent = `Season ${season.season_number}`;
+                seasonSelect.appendChild(opt);
+            });
+
+            const renderEpisodesForSeason = () => {
+                pillsGrid.innerHTML = '';
+                const activeSeasonNum = parseInt(seasonSelect.value) || 1;
+                const activeSeasonObj = seasons.find(s => s.season_number === activeSeasonNum) || { episode_count: 10 };
+
+                for (let ep = 1; ep <= (activeSeasonObj.episode_count || 10); ep++) {
+                    const btn = document.createElement('button');
+                    btn.className = `px-3 py-1 rounded-md text-xs font-extrabold shrink-0 transition ${ep === currentSelectedEpisode ? 'bg-brand-red text-white' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`;
+                    btn.textContent = `E${ep}`;
+                    btn.onclick = () => {
+                        currentSelectedEpisode = ep;
+                        renderEpisodesForSeason();
+                        updateModalEmbedPlayer();
+                    };
+                    pillsGrid.appendChild(btn);
+                }
+            };
+
+            seasonSelect.onchange = () => {
+                currentSelectedSeason = parseInt(seasonSelect.value) || 1;
+                currentSelectedEpisode = 1;
+                renderEpisodesForSeason();
+                updateModalEmbedPlayer();
+            };
+
+            renderEpisodesForSeason();
+        }
+
+        function switchStreamServer(server) {
+            playSynthesizedSound('click');
+            currentActiveServer = server;
+            
+            document.querySelectorAll('.server-btn').forEach(btn => {
+                btn.className = "server-btn px-3 py-1 rounded-md text-[11px] font-extrabold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition";
+            });
+            event.target.className = "server-btn px-3 py-1 rounded-md text-[11px] font-extrabold bg-brand-red text-white transition shadow";
+
+            updateModalEmbedPlayer();
+        }
+
+        function updateModalEmbedPlayer() {
+            if (!currentActiveModalMedia) return;
+
+            const iframe = document.getElementById('embed-player');
+            const spinner = document.getElementById('player-loading-spinner');
+            spinner.classList.remove('hidden');
+
+            const id = currentActiveModalMedia.id;
+            let src = '';
+
+            if (currentActiveServer === 'vidsrc') {
+                src = currentActiveMediaType === 'tv' 
+                    ? `https://vidsrc.to/embed/tv/${id}/${currentSelectedSeason}/${currentSelectedEpisode}`
+                    : `https://vidsrc.to/embed/movie/${id}`;
+            } else if (currentActiveServer === 'autoembed') {
+                src = currentActiveMediaType === 'tv'
+                    ? `https://player.autoembed.cc/embed/tv/${id}/${currentSelectedSeason}/${currentSelectedEpisode}`
+                    : `https://player.autoembed.cc/embed/movie/${id}`;
+            } else if (currentActiveServer === 'embedsu') {
+                src = currentActiveMediaType === 'tv'
+                    ? `https://embed.su/embed/tv/${id}/${currentSelectedSeason}/${currentSelectedEpisode}`
+                    : `https://embed.su/embed/movie/${id}`;
+            } else if (currentActiveServer === 'trailer') {
+                const trailerKey = currentActiveModalMedia.videos?.results?.find(v => v.type === 'Trailer')?.key || currentActiveModalMedia.youtube_key || 'zSWdZVtXT7E';
+                src = `https://www.youtube.com/embed/${trailerKey}?autoplay=1&rel=0`;
+            }
+
+            iframe.src = src;
+            setTimeout(() => spinner.classList.add('hidden'), 800);
+        }
+
+        function closeModal() {
+            playSynthesizedSound('click');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalContainer = document.getElementById('modal-container');
+            const iframe = document.getElementById('embed-player');
+
+            modalOverlay.classList.add('opacity-0');
+            modalContainer.classList.add('scale-95');
+            modalContainer.classList.remove('scale-100');
+            setTimeout(() => {
+                modalOverlay.classList.add('hidden');
+                iframe.src = '';
+            }, 300);
+        }
+
+        function toggleWatchlist(movie, type) {
+            playSynthesizedSound('click');
+            const index = watchlist.findIndex(item => item.id == movie.id);
+            const t = translations[currentLanguage];
+
+            if (index > -1) {
+                watchlist.splice(index, 1);
+                showToast(t.removedFromList);
+            } else {
+                watchlist.push({
+                    id: movie.id,
+                    title: movie.title || movie.name,
+                    poster_path: movie.poster_path,
+                    backdrop_path: movie.backdrop_path,
+                    media_type: type,
+                    vote_average: movie.vote_average
+                });
+                showToast(t.addedToList);
+            }
+
+            localStorage.setItem('gflix_watchlist', JSON.stringify(watchlist));
+            updateWatchlistCountBadge();
+            updateWatchlistModalButtonUI();
+            renderWatchlistGrid();
+        }
+
+        function updateWatchlistCountBadge() {
+            document.getElementById('watchlist-count-badge').textContent = watchlist.length;
+        }
+
+        function updateWatchlistModalButtonUI() {
+            if (!currentActiveModalMedia) return;
+            const isInList = watchlist.some(item => item.id == currentActiveModalMedia.id);
+            const icon = document.getElementById('modal-watchlist-icon');
+            const text = document.getElementById('modal-watchlist-text');
+
+            if (isInList) {
+                icon.className = "fa-solid fa-check text-emerald-400";
+                text.textContent = "In Watchlist";
+            } else {
+                icon.className = "fa-solid fa-plus text-brand-red";
+                text.textContent = "My Watchlist";
+            }
+
+            document.getElementById('modal-watchlist-btn').onclick = () => {
+                toggleWatchlist(currentActiveModalMedia, currentActiveMediaType);
+            };
+        }
+
+        function renderWatchlistGrid() {
+            const container = document.getElementById('watchlist-row-container');
+            const grid = document.getElementById('watchlist-row');
+            const emptyMsg = document.getElementById('watchlist-empty-msg');
+            grid.innerHTML = '';
+
+            if (watchlist.length === 0) {
+                emptyMsg.classList.remove('hidden');
+            } else {
+                emptyMsg.classList.add('hidden');
+                watchlist.forEach(movie => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative cursor-pointer movie-card rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 h-64 shadow-xl';
+
+                    const poster = document.createElement('img');
+                    const imgPath = movie.poster_path || movie.backdrop_path;
+                    poster.src = imgPath ? (imgPath.startsWith('http') ? imgPath : `${IMAGE_BASE_URL}${imgPath}`) : 'https://placehold.co/400x600/141414/FFFFFF?text=Stream';
+                    poster.className = 'w-full h-full object-cover';
+
+                    const overlay = document.createElement('div');
+                    overlay.className = 'absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-3';
+                    overlay.innerHTML = `
+                        <div class="text-xs w-full">
+                            <p class="font-bold text-white truncate">${movie.title}</p>
+                            <p class="text-amber-400 text-[10px] mt-1"><i class="fa-solid fa-star mr-1"></i>${movie.vote_average ? movie.vote_average.toFixed(1) : '8.5'}</p>
+                        </div>
+                    `;
+
+                    wrapper.dataset.movieId = movie.id;
+                    wrapper.dataset.mediaType = movie.media_type;
+                    wrapper.addEventListener('click', handleMovieCardClick);
+
+                    wrapper.appendChild(poster);
+                    wrapper.appendChild(overlay);
+                    grid.appendChild(wrapper);
+                });
+            }
+        }
+
+        function filterByGenre(genre) {
+            playSynthesizedSound('click');
+            document.querySelectorAll('.genre-pill').forEach(btn => {
+                btn.classList.remove('active', 'bg-brand-red');
+            });
+            
+            const activeBtn = document.querySelector(`.genre-pill[data-genre="${genre}"]`);
+            if (activeBtn) activeBtn.classList.add('active', 'bg-brand-red');
+
+            const movieRows = document.getElementById('movie-rows');
+            const top10 = document.getElementById('top10-container');
+            const watchlistContainer = document.getElementById('watchlist-row-container');
+
+            if (genre === 'watchlist') {
+                movieRows.classList.add('hidden');
+                top10.classList.add('hidden');
+                watchlistContainer.classList.remove('hidden');
+                renderWatchlistGrid();
+            } else {
+                movieRows.classList.remove('hidden');
+                top10.classList.remove('hidden');
+                watchlistContainer.classList.add('hidden');
+            }
+        }
+
+        // Live Search Handling
+        let searchTimer = null;
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            const clearBtn = document.getElementById('search-clear-btn');
+            
+            if (query.length > 0) clearBtn.classList.remove('hidden');
+            else clearBtn.classList.add('hidden');
+
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => executeSearch(query), 350);
+        });
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-clear-btn').classList.add('hidden');
+            document.getElementById('search-row-container').classList.add('hidden');
+        }
+
+        async function executeSearch(query) {
+            if (!query) {
+                document.getElementById('search-row-container').classList.add('hidden');
+                return;
+            }
+
+            let results = [];
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    results = data.results || [];
+                }
+            } catch (e) {}
+
+            if (results.length === 0) {
+                results = FALLBACK_MOVIES.filter(m => (m.title || m.name).toLowerCase().includes(query.toLowerCase()));
+            }
+
+            const rowContainer = document.getElementById('search-row-container');
+            const grid = document.getElementById('search-results-row');
+            grid.innerHTML = '';
+
+            if (results.length > 0) {
+                rowContainer.classList.remove('hidden');
+                results.slice(0, 10).forEach(movie => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative cursor-pointer movie-card rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 h-52 shadow-xl';
+
+                    const poster = document.createElement('img');
+                    const imgPath = movie.poster_path || movie.backdrop_path;
+                    poster.src = imgPath ? (imgPath.startsWith('http') ? imgPath : `${IMAGE_BASE_URL}${imgPath}`) : 'https://placehold.co/400x600/141414/FFFFFF?text=Stream';
+                    poster.className = 'w-full h-full object-cover';
+
+                    wrapper.dataset.movieId = movie.id;
+                    wrapper.dataset.mediaType = movie.media_type || 'movie';
+                    wrapper.addEventListener('click', handleMovieCardClick);
+
+                    wrapper.appendChild(poster);
+                    grid.appendChild(wrapper);
+                });
+            }
+        }
+
+        // Hero Spotlight Carousel Engine
+        function startHeroCarousel(catalog) {
+            heroCatalog = catalog.slice(0, 5);
+            const dotsContainer = document.getElementById('hero-carousel-dots');
+            dotsContainer.innerHTML = '';
+
+            heroCatalog.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.className = `h-2 rounded-full transition-all duration-300 ${i === 0 ? 'w-8 bg-brand-red' : 'w-2 bg-zinc-600'}`;
+                dot.onclick = () => setHeroSlide(i);
+                dotsContainer.appendChild(dot);
+            });
+
+            setHeroSlide(0);
+            if (heroCarouselTimer) clearInterval(heroCarouselTimer);
+            heroCarouselTimer = setInterval(() => {
+                currentHeroIndex = (currentHeroIndex + 1) % heroCatalog.length;
+                setHeroSlide(currentHeroIndex);
+            }, 7000);
+        }
+
+        function setHeroSlide(index) {
+            currentHeroIndex = index;
+            const item = heroCatalog[index];
+            if (!item) return;
+
+            const bgUrl = item.backdrop_path ? `${IMAGE_ORIGINAL_URL}${item.backdrop_path}` : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80';
+            document.getElementById('banner').style.backgroundImage = `url('${bgUrl}')`;
+            document.getElementById('banner-title').textContent = item.title || item.name;
+            document.getElementById('banner-description').textContent = item.overview;
+
+            document.getElementById('banner-play-btn').onclick = () => openStreamModal(item, item.media_type || 'movie');
+            document.getElementById('banner-info-btn').onclick = () => openStreamModal(item, item.media_type || 'movie');
+
+            // Update Dots
+            document.querySelectorAll('#hero-carousel-dots button').forEach((dot, i) => {
+                dot.className = `h-2 rounded-full transition-all duration-300 ${i === index ? 'w-8 bg-brand-red' : 'w-2 bg-zinc-600'}`;
+            });
+        }
+
+        // Profile Selection Handling
+        function openProfileModal() {
+            document.getElementById('profile-modal').classList.remove('hidden');
+        }
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+        function selectProfile(name, avatar) {
+            activeProfile = { name, avatar };
+            localStorage.setItem('gflix_profile', JSON.stringify(activeProfile));
+            
+            document.getElementById('desktop-profile-name').textContent = name;
+            document.getElementById('desktop-profile-avatar').src = avatar;
+            document.getElementById('mobile-profile-avatar').src = avatar;
+            
+            closeProfileModal();
+            showToast(`Switched profile to ${name}`);
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'tl' : 'en';
+            localStorage.setItem('gflix_lang', currentLanguage);
+            document.getElementById('lang-label').textContent = currentLanguage.toUpperCase();
+            document.getElementById('mobile-lang-label').textContent = currentLanguage.toUpperCase();
+            showToast(currentLanguage === 'en' ? "Language: English" : "Wika: Filipino");
+        }
+
+        // Application Initialization
+        document.addEventListener('DOMContentLoaded', async () => {
+            updateWatchlistCountBadge();
+            renderContinueWatchingRow();
+
+            // Load TMDB Dynamic Content Rows
+            const trending = await fetchData('/trending/all/week?api_key=' + API_KEY);
+            const topRated = await fetchData('/movie/top_rated?api_key=' + API_KEY);
+            const action = await fetchData('/discover/movie?api_key=' + API_KEY + '&with_genres=28');
+            const tvShows = await fetchData('/discover/tv?api_key=' + API_KEY + '&with_genres=10759');
+
+            startHeroCarousel(trending);
+            renderTop10Row(trending);
+
+            const t = translations[currentLanguage];
+            createStandardMovieRow(t.trendingNow, trending, true);
+            createStandardMovieRow(t.topRated, topRated, false);
+            createStandardMovieRow(t.actionMovies, action, false);
+            createStandardMovieRow(t.tvShows, tvShows, true);
+
+            // Modal Controls
+            document.getElementById('modal-close-btn').onclick = closeModal;
+            document.getElementById('modal-overlay').onclick = (e) => {
+                if (e.target === document.getElementById('modal-overlay')) closeModal();
+            };
+
+            window.onscroll = () => {
+                const nav = document.getElementById('navbar');
+                if (window.scrollY > 50) nav.classList.add('scrolled');
+                else nav.classList.remove('scrolled');
+            };
+        });
+    </script>
+</body>
+</html>
