@@ -73,7 +73,25 @@
         </div>
       </div>
       
-      <div class="server-selector">
+      <!-- Episode Selector (shown only for TV shows) -->
+      <div class="episode-selector" id="episode-selector" style="display: none;">
+        <div class="selector-group">
+          <label for="season-select">Season:</label>
+          <select id="season-select" onchange="onSeasonChange()">
+            <option>Loading seasons...</option>
+          </select>
+        </div>
+        
+        <div class="selector-group">
+          <label for="episode-select">Episode:</label>
+          <select id="episode-select" onchange="onEpisodeChange()">
+            <option>Loading episodes...</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Server Selector -->
+      <div class="server-selector" id="server-selector">
         <label for="server">Server:</label>
         <select id="server" onchange="changeServer()">
           <option value="vidsrc.cc">Vidsrc.cc</option>
