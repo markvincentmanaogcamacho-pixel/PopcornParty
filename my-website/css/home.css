@@ -353,6 +353,36 @@ body {
   transform: scale(1.1);
 }
 
+/* Watch progress bar */
+.progress-bar {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 0 0 4px 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #e50914;
+  transition: width 0.3s;
+}
+
+.continue-watching-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 10;
+}
 /* Adjust hover card position based on screen location */
 .list-item:nth-child(-n+3) .hover-card {
   left: 0;
