@@ -230,10 +230,139 @@ body {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.list img:hover {
-  transform: scale(1.08);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.8);
-  z-index: 10;
+/* Enhanced hover card system */
+.list-item {
+  min-width: 200px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease 0.2s, z-index 0s 0.5s;
+}
+
+.list-item:hover {
+  transform: scale(1.5);
+  z-index: 100;
+  transition: transform 0.3s ease 0.2s, z-index 0s;
+}
+
+.list img {
+  width: 100%;
+  border-radius: 4px;
+  transition: none;
+}
+
+/* Hover preview card */
+.hover-card {
+  position: absolute;
+  top: -50%;
+  left: 0;
+  width: 100%;
+  min-width: 300px;
+  background: #181818;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.9);
+  z-index: 101;
+  opacity: 0;
+  animation: fadeInCard 0.3s ease 0.5s forwards;
+}
+
+@keyframes fadeInCard {
+  to { opacity: 1; }
+}
+
+.hover-card-backdrop {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.hover-card-info {
+  padding: 12px;
+}
+
+.hover-card-info h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.hover-card-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.hover-card-meta .match {
+  color: #46d369;
+  font-weight: 700;
+}
+
+.hover-card-meta span {
+  color: #d2d2d2;
+}
+
+.hover-card-description {
+  font-size: 12px;
+  color: #d2d2d2;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hover-card-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.hover-card-buttons button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.5);
+  background: rgba(42,42,42,0.6);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.hover-card-buttons button:first-child {
+  background: white;
+  color: black;
+  border-color: white;
+}
+
+.hover-card-buttons button:first-child:hover {
+  background: rgba(255,255,255,0.8);
+}
+
+.hover-card-buttons button:hover {
+  border-color: white;
+  background: rgba(255,255,255,0.1);
+  transform: scale(1.1);
+}
+
+/* Adjust hover card position based on screen location */
+.list-item:nth-child(-n+3) .hover-card {
+  left: 0;
+  top: -20%;
+}
+
+.list-item:nth-last-child(-n+3) .hover-card {
+  right: 0;
+  left: auto;
+  top: -20%;
 }
 
 /* Netflix Modal */
