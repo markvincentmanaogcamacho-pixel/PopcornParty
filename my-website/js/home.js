@@ -4,6 +4,9 @@ const IMG_URL = 'https://image.tmdb.org/t/p/original';
 let currentItem;
 let bannerItem;
 let currentSeasons = [];
+// ADD THESE NEW LINES:
+let myList = JSON.parse(localStorage.getItem('myList')) || [];
+let watchProgress = JSON.parse(localStorage.getItem('watchProgress')) || {};
 
 // Navbar scroll effect
 window.addEventListener('scroll', () => {
@@ -402,6 +405,66 @@ async function searchTMDB() {
   });
 }
 
+// ========== MY LIST FUNCTIONALITY ==========
+
+function toggleMyList(item) {
+  const index = myList.findIndex(i => i.id === item.id && i.media_type === item.media_type);
+  
+  if (index > -1) {
+    // Remove from list
+    myList.splice(index, 1);
+    console.log('Removed from My List:', item.title || item.name);
+  } else {
+    // Add to list
+    myList.push(item);
+    console.log('Added to My List:', item.title || item.name);
+  }
+  
+  // Save to localStorage
+  localStorage.setItem('myList', JSON.stringify(myList));
+  
+  // Refresh My List display
+  displayMyList();
+}
+
+function isInMyList(itemId, mediaType) {
+  return myList.some(item => item.id === itemId && item.media_type === mediaType);
+}
+
+function displayMyList() {
+  const row = document.getElementById('mylist-row');
+  const container = document.getElementById('mylist-list');
+  
+  if (myList.length === 0) {
+    row.style.display = 'none';
+    return;
+  }
+  
+  row.style.display = 'block';
+  displayList(myList, 'mylist-list');
+}
+
+// ========== WATCH PROGRESS FUNCTIONALITY ==========
+
+function updateWatchProgress(itemId, mediaType, currentTime, duration) {
+  const key = `${itemId}-${mediaType}`;
+  
+  watchProgress[key] = {
+    id: itemId,
+    mediaType: mediaType,
+    currentTime: currentTime,
+    duration: duration,
+    percentage: (currentTime / duration) * 100,
+    timestamp: Date.now()
+  };
+  
+  localStorage.setItem('watchProgress', JSON.stringify(watchProgress));
+}
+
+function getWatchProgress(itemId, mediaType) {
+  const key = `${itemId}-${mediaType}`;
+  return watchProgress[key] || null;
+}
 async function init() {
   const movies = await fetchTrending('movie');
   const tvShows = await fetchTrending('tv');
@@ -411,9 +474,11 @@ async function init() {
     displayBanner(movies[Math.floor(Math.random() * movies.length)]);
   }
   
+  // ADD THIS LINE:
+  displayMyList();
+  
   displayList(movies, 'movies-list');
   displayList(tvShows, 'tvshows-list');
   displayList(anime, 'anime-list');
 }
-
 init();
