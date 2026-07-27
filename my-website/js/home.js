@@ -93,12 +93,94 @@ function displayList(items, containerId) {
       img.onclick = () => showDetails(item);
       
       div.appendChild(img);
+      
+      // Add hover card functionality
+      createHoverCard(item, div);
+      
       container.appendChild(div);
     });
     
-    // Add scroll arrows after items are loaded
     addScrollButtons(containerId);
   }, 100);
+}
+
+// NEW FUNCTION - Add this after addScrollButtons function
+function createHoverCard(item, containerDiv) {
+  let hoverTimeout;
+  let card;
+  
+  containerDiv.addEventListener('mouseenter', () => {
+    hoverTimeout = setTimeout(() => {
+      // Create hover card
+      card = document.createElement('div');
+      card.className = 'hover-card';
+      
+      const year = item.release_date?.substring(0,4) || item.first_air_date?.substring(0,4) || 'N/A';
+      const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+      const description = item.overview ? 
+        (item.overview.length > 120 ? item.overview.substring(0, 120) + '...' : item.overview) 
+        : 'No description available.';
+      
+      card.innerHTML = `
+        <img class="hover-card-backdrop" src="${IMG_URL}${item.backdrop_path || item.poster_path}" alt="">
+        <div class="hover-card-info">
+          <h3>${item.title || item.name}</h3>
+          <div class="hover-card-meta">
+            <span class="match">★ ${rating}</span>
+            <span>${year}</span>
+          </div>
+          <p class="hover-card-description">${description}</p>
+          <div class="hover-card-buttons">
+            <button title="Play">
+              <i class="fas fa-play"></i>
+            </button>
+            <button title="Add to My List">
+              <i class="fas fa-plus"></i>
+            </button>
+            <button title="Like">
+              <i class="fas fa-thumbs-up"></i>
+            </button>
+            <button title="More Info">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      
+      // Add click handlers
+      const playBtn = card.querySelector('.hover-card-buttons button:first-child');
+      playBtn.onclick = (e) => {
+        e.stopPropagation();
+        showDetails(item);
+      };
+      
+      const addBtn = card.querySelector('.hover-card-buttons button:nth-child(2)');
+      addBtn.onclick = (e) => {
+        e.stopPropagation();
+        toggleMyList(item);
+        addBtn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => {
+          addBtn.innerHTML = '<i class="fas fa-plus"></i>';
+        }, 1000);
+      };
+      
+      const infoBtn = card.querySelector('.hover-card-buttons button:last-child');
+      infoBtn.onclick = (e) => {
+        e.stopPropagation();
+        showDetails(item);
+      };
+      
+      containerDiv.appendChild(card);
+    }, 500); // Show card after 500ms hover
+  });
+  
+  containerDiv.addEventListener('mouseleave', () => {
+    clearTimeout(hoverTimeout);
+    if (card) {
+      card.remove();
+      card = null;
+    }
+  });
 }
 
 // NEW FUNCTION - Add this right after the displayList function
