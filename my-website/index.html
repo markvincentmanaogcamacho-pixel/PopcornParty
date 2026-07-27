@@ -12,17 +12,31 @@
 </head>
 
 <body>
-  <div class="navbar">
-    <img src="logo.png" alt="LOGO HERE" />
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <input type="text" class="search-bar" placeholder="Search..." onfocus="openSearchModal()" />
-    </div>
-  </div>
+  <header class="navbar" id="navbar">
+  <img src="logo.png" alt="Popcorn Party Logo" />
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="#">Movies</a>
+    <a href="#">TV Shows</a>
+    <a href="#">Anime</a>
+    <input type="text" class="search-bar" placeholder="Search..." onfocus="openSearchModal()" />
+  </nav>
+</header>
 
   <div class="banner" id="banner">
+  <div class="banner-content">
     <h1 id="banner-title"></h1>
+    <p id="banner-description"></p>
+    <div class="banner-buttons">
+      <button class="btn btn-play" onclick="playBanner()">
+        <i class="fas fa-play"></i> Play
+      </button>
+      <button class="btn btn-info" onclick="showBannerInfo()">
+        <i class="fas fa-info-circle"></i> More Info
+      </button>
+    </div>
   </div>
+</div>
 
   <div class="row">
     <h2>Trending Movies</h2>
@@ -39,44 +53,57 @@
     <div class="list" id="anime-list"></div>
   </div>
 
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()" style="color: red;">&times;</span>
-      <div class="modal-body">
-  <img id="modal-image" src="" alt="" />
-  <div class="modal-text">
-    <h2 id="modal-title"></h2>
-    <div class="stars" id="modal-rating"></div>
-    <p id="modal-description"></p>
-  </div>
-</div>
+  <div class="modal" id="modal" onclick="closeModalOnBackdrop(event)">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    
+    <div class="modal-header" id="modal-backdrop">
+      <div class="modal-header-content">
+        <h2 id="modal-title"></h2>
+        <div class="stars" id="modal-rating"></div>
+      </div>
+    </div>
+    
+    <div class="modal-body">
+      <div class="modal-info">
+        <div class="modal-description" id="modal-description"></div>
+        <div class="modal-meta">
+          <p><span>Release:</span> <span id="modal-date"></span></p>
+          <p><span>Rating:</span> <span id="modal-vote"></span></p>
+        </div>
+      </div>
       
       <div class="server-selector">
-        <label for="server">Change Server:</label>
+        <label for="server">Server:</label>
         <select id="server" onchange="changeServer()">
           <option value="vidsrc.cc">Vidsrc.cc</option>
           <option value="vidsrc.me">Vidsrc.me</option>
           <option value="player.videasy.net">Player.Videasy.net</option>
         </select>
       </div>
-      <iframe id="modal-video" width="100%" height="315" frameborder="0" allowfullscreen></iframe>
+      
+      <iframe id="modal-video" allowfullscreen></iframe>
     </div>
   </div>
+</div>
 
-  <div class="search-modal" id="search-modal">
-    <span class="close" onclick="closeSearchModal()" style="color: red;">&times;</span>
-    <input type="text" id="search-input" placeholder="Search for a movie or show..." oninput="searchTMDB()" />
-    <div class="results" id="search-results"></div>
-  </div>
+  <div class="search-modal" id="search-modal" onclick="closeSearchModalOnBackdrop(event)">
+  <span class="close" onclick="closeSearchModal()">&times;</span>
+  <input type="text" id="search-input" placeholder="Titles, people, genres..." oninput="searchTMDB()" />
+  <div class="results" id="search-results"></div>
+</div>
 
 <footer class="footer">
   <div class="footer-content">
-    <p>&copy; 2025 My Website. All rights reserved.</p>
     <div class="footer-links">
-      <a href="#">Disclaimer</a>
-      <a href="#">About Us</a>
+      <a href="#">FAQ</a>
+      <a href="#">Help Center</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Privacy</a>
+      <a href="#">Cookie Preferences</a>
       <a href="#">Contact Us</a>
     </div>
+    <p>&copy; 2025 Popcorn Party. All rights reserved.</p>
   </div>
 </footer>
 
