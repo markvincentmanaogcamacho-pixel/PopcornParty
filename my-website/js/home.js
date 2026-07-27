@@ -3,6 +3,7 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/original';
 let currentItem;
 let bannerItem;
+let currentSeasons = [];
 
 // Navbar scroll effect
 window.addEventListener('scroll', () => {
@@ -39,6 +40,32 @@ async function fetchTrendingAnime() {
   return allResults;
 }
 
+// Fetch TV show details including seasons
+async function fetchTVShowDetails(tvId) {
+  try {
+    const res = await fetch(`${BASE_URL}/tv/${tvId}?api_key=${API_KEY}`);
+    if (!res.ok) throw new Error('Failed to fetch TV details');
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching TV details:', error);
+    return null;
+  }
+}
+
+// Fetch season details including episodes
+async function fetchSeasonDetails(tvId, seasonNumber) {
+  try {
+    const res = await fetch(`${BASE_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${API_KEY}`);
+    if (!res.ok) throw new Error('Failed to fetch season details');
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching season details:', error);
+    return null;
+  }
+}
+
 function displayBanner(item) {
   bannerItem = item;
   const banner = document.getElementById('banner');
@@ -71,8 +98,10 @@ function displayList(items, containerId) {
   }, 100);
 }
 
-function showDetails(item) {
+async function showDetails(item) {
   currentItem = item;
+  const isTVShow = item.media_type === "tv" || item.first_air_date;
+  
   document.getElementById('modal-title').textContent = item.title || item.name;
   document.getElementById('modal-description').textContent = item.overview || 'No description available.';
   document.getElementById('modal-backdrop').style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
@@ -80,22 +109,101 @@ function showDetails(item) {
   document.getElementById('modal-date').textContent = item.release_date || item.first_air_date || 'N/A';
   document.getElementById('modal-vote').textContent = item.vote_average ? item.vote_average.toFixed(1) + '/10' : 'N/A';
   
+  // Show/hide season/episode selectors based on content type
+  const episodeSelector = document.getElementById('episode-selector');
+  const serverSelector = document.getElementById('server-selector');
+  
+  if (isTVShow) {
+    // Fetch TV show details to get seasons
+    const tvDetails = await fetchTVShowDetails(item.id);
+    if (tvDetails && tvDetails.seasons) {
+      currentSeasons = tvDetails.seasons.filter(s => s.season_number > 0); // Filter out "specials"
+      populateSeasonSelector(currentSeasons);
+      episodeSelector.style.display = 'block';
+      
+      // Load first season's episodes
+      if (currentSeasons.length > 0) {
+        await loadEpisodes(item.id, currentSeasons[0].season_number);
+      }
+    }
+  } else {
+    episodeSelector.style.display = 'none';
+  }
+  
   changeServer();
   document.getElementById('modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
 
+function populateSeasonSelector(seasons) {
+  const seasonSelect = document.getElementById('season-select');
+  seasonSelect.innerHTML = '';
+  
+  seasons.forEach(season => {
+    const option = document.createElement('option');
+    option.value = season.season_number;
+    option.textContent = `Season ${season.season_number}`;
+    seasonSelect.appendChild(option);
+  });
+}
+
+async function loadEpisodes(tvId, seasonNumber) {
+  const episodeSelect = document.getElementById('episode-select');
+  episodeSelect.innerHTML = '<option>Loading episodes...</option>';
+  
+  const seasonDetails = await fetchSeasonDetails(tvId, seasonNumber);
+  
+  if (seasonDetails && seasonDetails.episodes) {
+    episodeSelect.innerHTML = '';
+    seasonDetails.episodes.forEach(episode => {
+      const option = document.createElement('option');
+      option.value = episode.episode_number;
+      option.textContent = `Episode ${episode.episode_number}: ${episode.name}`;
+      episodeSelect.appendChild(option);
+    });
+    
+    // Automatically load first episode
+    changeServer();
+  } else {
+    episodeSelect.innerHTML = '<option>No episodes found</option>';
+  }
+}
+
+async function onSeasonChange() {
+  const seasonNumber = document.getElementById('season-select').value;
+  await loadEpisodes(currentItem.id, seasonNumber);
+}
+
+function onEpisodeChange() {
+  changeServer();
+}
+
 function changeServer() {
   const server = document.getElementById('server').value;
-  const type = currentItem.media_type === "movie" ? "movie" : "tv";
+  const isTVShow = currentItem.media_type === "tv" || currentItem.first_air_date;
+  const type = isTVShow ? "tv" : "movie";
   let embedURL = "";
 
-  if (server === "vidsrc.cc") {
-    embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
-  } else if (server === "vidsrc.me") {
-    embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`;
-  } else if (server === "player.videasy.net") {
-    embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
+  if (isTVShow) {
+    const season = document.getElementById('season-select').value;
+    const episode = document.getElementById('episode-select').value;
+    
+    if (server === "vidsrc.cc") {
+      embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}/${season}/${episode}`;
+    } else if (server === "vidsrc.me") {
+      embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}&season=${season}&episode=${episode}`;
+    } else if (server === "player.videasy.net") {
+      embedURL = `https://player.videasy.net/${type}/${currentItem.id}/${season}/${episode}`;
+    }
+  } else {
+    // Movie
+    if (server === "vidsrc.cc") {
+      embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
+    } else if (server === "vidsrc.me") {
+      embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`;
+    } else if (server === "player.videasy.net") {
+      embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
+    }
   }
 
   document.getElementById('modal-video').src = embedURL;
@@ -105,6 +213,7 @@ function closeModal() {
   document.getElementById('modal').style.display = 'none';
   document.getElementById('modal-video').src = '';
   document.body.style.overflow = 'auto';
+  currentSeasons = [];
 }
 
 function closeModalOnBackdrop(event) {
