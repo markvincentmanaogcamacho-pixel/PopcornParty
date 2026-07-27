@@ -95,7 +95,47 @@ function displayList(items, containerId) {
       div.appendChild(img);
       container.appendChild(div);
     });
+    
+    // Add scroll arrows after items are loaded
+    addScrollButtons(containerId);
   }, 100);
+}
+
+// NEW FUNCTION - Add this right after the displayList function
+function addScrollButtons(containerId) {
+  const container = document.getElementById(containerId);
+  const row = container.parentElement;
+  
+  // Remove existing buttons if any
+  const existingButtons = row.querySelectorAll('.scroll-btn');
+  existingButtons.forEach(btn => btn.remove());
+  
+  // Create left arrow
+  const leftBtn = document.createElement('button');
+  leftBtn.className = 'scroll-btn scroll-left';
+  leftBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+  leftBtn.onclick = () => {
+    container.scrollBy({ left: -600, behavior: 'smooth' });
+  };
+  
+  // Create right arrow
+  const rightBtn = document.createElement('button');
+  rightBtn.className = 'scroll-btn scroll-right';
+  rightBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+  rightBtn.onclick = () => {
+    container.scrollBy({ left: 600, behavior: 'smooth' });
+  };
+  
+  // Add buttons to row
+  row.appendChild(leftBtn);
+  row.appendChild(rightBtn);
+  
+  // Hide left arrow initially if at start
+  container.addEventListener('scroll', () => {
+    leftBtn.style.opacity = container.scrollLeft <= 0 ? '0' : '1';
+    rightBtn.style.opacity = 
+      container.scrollLeft >= (container.scrollWidth - container.clientWidth) ? '0' : '1';
+  });
 }
 
 async function showDetails(item) {
