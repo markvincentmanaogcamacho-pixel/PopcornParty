@@ -527,10 +527,24 @@ async function init() {
   }
   
   displayMyList();
-  displayContinueWatching(); // ADD THIS LINE
+  displayContinueWatching();
   
   displayList(movies, 'movies-list');
   displayList(tvShows, 'tvshows-list');
   displayList(anime, 'anime-list');
+  
+  // ADD THESE LINES FOR GENRE CATEGORIES:
+  const action = await fetchByGenre(GENRES.action);
+  displayList(action, 'action-list');
+  
+  const comedy = await fetchByGenre(GENRES.comedy);
+  displayList(comedy, 'comedy-list');
+  
+  const horror = await fetchByGenre(GENRES.horror);
+  displayList(horror, 'horror-list');
+  
+  const romance = await fetchByGenre(GENRES.romance);
+  displayList(romance, 'romance-list');
 }
+
 init();
