@@ -97,9 +97,21 @@ function displayList(items, containerId) {
       
       div.appendChild(img);
       
-      // Add hover card functionality
-      createHoverCard(item, div);
+      // ADD PROGRESS BAR IF ITEM HAS WATCH PROGRESS
+      const progress = getWatchProgress(item.id, item.media_type || 'movie');
+      if (progress && progress.percentage > 5 && progress.percentage < 95) {
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        progressBar.innerHTML = `<div class="progress-fill" style="width: ${progress.percentage}%"></div>`;
+        div.appendChild(progressBar);
+        
+        const badge = document.createElement('div');
+        badge.className = 'continue-watching-badge';
+        badge.textContent = `${Math.round(progress.percentage)}%`;
+        div.appendChild(badge);
+      }
       
+      createHoverCard(item, div);
       container.appendChild(div);
     });
     
@@ -272,6 +284,46 @@ function populateSeasonSelector(seasons) {
   });
 }
 
+// Get recently watched items
+function getContinueWatching() {
+  const items = Object.values(watchProgress)
+    .filter(p => p.percentage > 5 && p.percentage < 95)
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 10);
+  
+  return items;
+}
+
+async function displayContinueWatching() {
+  const continueItems = getContinueWatching();
+  const row = document.getElementById('continue-watching-row');
+  
+  if (continueItems.length === 0) {
+    row.style.display = 'none';
+    return;
+  }
+  
+  row.style.display = 'block';
+  
+  // Fetch full item details for each continue watching item
+  const fullItems = await Promise.all(
+    continueItems.map(async (progress) => {
+      try {
+        const type = progress.mediaType || 'movie';
+        const res = await fetch(`${BASE_URL}/${type}/${progress.id}?api_key=${API_KEY}`);
+        const item = await res.json();
+        item.media_type = type;
+        return item;
+      } catch (error) {
+        console.error('Error fetching continue watching item:', error);
+        return null;
+      }
+    })
+  );
+  
+  const validItems = fullItems.filter(item => item !== null);
+  displayList(validItems, 'continue-watching-list');
+}
 async function loadEpisodes(tvId, seasonNumber) {
   const episodeSelect = document.getElementById('episode-select');
   episodeSelect.innerHTML = '<option>Loading episodes...</option>';
@@ -474,11 +526,10 @@ async function init() {
     displayBanner(movies[Math.floor(Math.random() * movies.length)]);
   }
   
-  // ADD THIS LINE:
   displayMyList();
+  displayContinueWatching(); // ADD THIS LINE
   
   displayList(movies, 'movies-list');
   displayList(tvShows, 'tvshows-list');
   displayList(anime, 'anime-list');
 }
-init();
