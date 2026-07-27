@@ -533,3 +533,4 @@ async function init() {
   displayList(tvShows, 'tvshows-list');
   displayList(anime, 'anime-list');
 }
+init();
