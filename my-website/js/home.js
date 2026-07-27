@@ -517,6 +517,36 @@ function getWatchProgress(itemId, mediaType) {
   const key = `${itemId}-${mediaType}`;
   return watchProgress[key] || null;
 }
+// ========== GENRE FUNCTIONALITY ==========
+
+// Genre IDs from TMDB API
+const GENRES = {
+  action: 28,
+  comedy: 35,
+  horror: 27,
+  romance: 10749,
+  scifi: 878,
+  thriller: 53,
+  documentary: 99,
+  animation: 16
+};
+
+async function fetchByGenre(genreId, type = 'movie') {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=1`
+    );
+    if (!res.ok) throw new Error('Failed to fetch genre');
+    const data = await res.json();
+    return data.results;
+  } catch (error) {
+    console.error('Error fetching genre:', error);
+    return [];
+  }
+}
+
+// ========== END GENRE FUNCTIONALITY ==========
+
 async function init() {
   const movies = await fetchTrending('movie');
   const tvShows = await fetchTrending('tv');
