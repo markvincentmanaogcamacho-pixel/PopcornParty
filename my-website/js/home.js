@@ -360,29 +360,84 @@ function changeServer() {
   const isTVShow = currentItem.media_type === "tv" || currentItem.first_air_date;
   const type = isTVShow ? "tv" : "movie";
   let embedURL = "";
+  
+  const tmdbId = currentItem.id;
 
   if (isTVShow) {
     const season = document.getElementById('season-select').value;
     const episode = document.getElementById('episode-select').value;
     
-    if (server === "vidsrc.cc") {
-      embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}/${season}/${episode}`;
-    } else if (server === "vidsrc.me") {
-      embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}&season=${season}&episode=${episode}`;
-    } else if (server === "player.videasy.net") {
-      embedURL = `https://player.videasy.net/${type}/${currentItem.id}/${season}/${episode}`;
+    switch(server) {
+      case "vidsrc.pro":
+        // Vidsrc Pro - Best subtitle support
+        embedURL = `https://vidsrc.pro/embed/${type}/${tmdbId}/${season}/${episode}`;
+        break;
+        
+      case "vidsrc.me":
+        embedURL = `https://vidsrc.me/embed/${type}?tmdb=${tmdbId}&season=${season}&episode=${episode}`;
+        break;
+        
+      case "vidsrc.cc":
+        embedURL = `https://vidsrc.cc/v2/embed/${type}/${tmdbId}/${season}/${episode}`;
+        break;
+        
+      case "multiembed":
+        embedURL = `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`;
+        break;
+        
+      case "2embed":
+        embedURL = `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`;
+        break;
+        
+      case "autoembed":
+        embedURL = `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`;
+        break;
+        
+      case "player.videasy.net":
+        embedURL = `https://player.videasy.net/${type}/${tmdbId}/${season}/${episode}`;
+        break;
+        
+      default:
+        embedURL = `https://vidsrc.pro/embed/${type}/${tmdbId}/${season}/${episode}`;
     }
   } else {
-    // Movie
-    if (server === "vidsrc.cc") {
-      embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
-    } else if (server === "vidsrc.me") {
-      embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`;
-    } else if (server === "player.videasy.net") {
-      embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
+    // Movies
+    switch(server) {
+      case "vidsrc.pro":
+        // Vidsrc Pro - Best subtitle support
+        embedURL = `https://vidsrc.pro/embed/movie/${tmdbId}`;
+        break;
+        
+      case "vidsrc.me":
+        embedURL = `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
+        break;
+        
+      case "vidsrc.cc":
+        embedURL = `https://vidsrc.cc/v2/embed/movie/${tmdbId}`;
+        break;
+        
+      case "multiembed":
+        embedURL = `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
+        break;
+        
+      case "2embed":
+        embedURL = `https://www.2embed.cc/embed/${tmdbId}`;
+        break;
+        
+      case "autoembed":
+        embedURL = `https://player.autoembed.cc/embed/movie/${tmdbId}`;
+        break;
+        
+      case "player.videasy.net":
+        embedURL = `https://player.videasy.net/movie/${tmdbId}`;
+        break;
+        
+      default:
+        embedURL = `https://vidsrc.pro/embed/movie/${tmdbId}`;
     }
   }
 
+  console.log('Loading:', embedURL); // For debugging
   document.getElementById('modal-video').src = embedURL;
 }
 
