@@ -633,33 +633,3 @@ async function init() {
 }
 
 init();
-// ========== TESTING & DEBUGGING FUNCTIONS ==========
-
-// Test Continue Watching feature
-window.simulateWatchProgress = function(percentage = null) {
-  if (!currentItem) {
-    console.error('❌ No item selected. Click on a movie/show first, then run this command.');
-    return;
-  }
-  
-  const randomProgress = percentage || (Math.floor(Math.random() * 70) + 15);
-  updateWatchProgress(currentItem.id, currentItem.media_type || 'movie', randomProgress, 100);
-  console.log(`✅ Added ${randomProgress}% progress to: ${currentItem.title || currentItem.name}`);
-  console.log('🔄 Refresh the page to see "Continue Watching" section');
-};
-
-// Clear all watch progress
-window.clearAllProgress = function() {
-  watchProgress = {};
-  localStorage.removeItem('watchProgress');
-  console.log('✅ All watch progress cleared');
-  location.reload();
-};
-
-// Console welcome message
-console.log('%c🍿 Popcorn Party Developer Tools', 'font-size: 16px; font-weight: bold; color: #e50914;');
-console.log('%cTo test Continue Watching:', 'font-size: 14px; font-weight: bold; color: #46d369;');
-console.log('  1. Click on any movie/show');
-console.log('  2. Type: simulateWatchProgress(45)');
-console.log('  3. Refresh the page');
-console.log('  4. "Continue Watching" section will appear!');
