@@ -17,10 +17,10 @@
   <header class="navbar" id="navbar">
   <a href="index.html" class="logo-link"><img src="logo.png" alt="Popcorn Party Logo" /></a>
   <nav class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="#">Movies</a>
-    <a href="#">TV Shows</a>
-    <a href="#">Anime</a>
+    <a href="index.html" class="nav-tab" data-tab="home">Home</a>
+    <a href="#movies-row" class="nav-tab" data-tab="movies" onclick="scrollToSection(event)">Movies</a>
+    <a href="#tvshows-row" class="nav-tab" data-tab="tv" onclick="scrollToSection(event)">TV Shows</a>
+    <a href="#anime-row" class="nav-tab" data-tab="anime" onclick="scrollToSection(event)">Anime</a>
     <input type="text" class="search-bar" placeholder="Search..." onfocus="openSearchModal()" />
   </nav>
 </header>
@@ -50,17 +50,17 @@
   <h2>Continue Watching</h2>
   <div class="list" id="continue-watching-list"></div>
 </div>  
-  <div class="row">
+  <div class="row" id="movies-row">
     <h2>Trending Movies</h2>
     <div class="list" id="movies-list"></div>
   </div>
 
-  <div class="row">
+  <div class="row" id="tvshows-row">
     <h2>Trending TV Shows</h2>
     <div class="list" id="tvshows-list"></div>
   </div>
 
-    <div class="row">
+    <div class="row" id="anime-row">
     <h2>Trending Anime</h2>
     <div class="list" id="anime-list"></div>
   </div>

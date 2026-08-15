@@ -49,16 +49,36 @@ body {
   gap: 25px; 
 }
 
-.nav-links a { 
-  color: #e5e5e5; 
+.nav-links a {
+  color: #e5e5e5;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
-  transition: color 0.3s;
+  padding: 8px 4px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  border-radius: 4px;
+  transition: color 0.3s, background 0.3s;
 }
 
 .nav-links a:hover {
-  color: #b3b3b3;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Active tab indicator: red bottom border */
+.nav-tab.active {
+  color: #ffffff;
+  border-bottom: 2px solid #e50914;
+}
+
+/* Keep the logo link flush with the navbar */
+a.logo-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border-bottom: none;
 }
 
 .search-bar {

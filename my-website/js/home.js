@@ -8,6 +8,36 @@ let currentSeasons = [];
 let myList = JSON.parse(localStorage.getItem('myList')) || [];
 let watchProgress = JSON.parse(localStorage.getItem('watchProgress')) || {};
 
+// Tab navigation: smooth-scroll to the matching section
+function scrollToSection(event) {
+  const target = document.querySelector(event.currentTarget.getAttribute('href'));
+  if (target) {
+    event.preventDefault();
+    const offset = target.getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({ top: offset, behavior: 'smooth' });
+  }
+  setActiveTab(event.currentTarget.dataset.tab);
+}
+
+function setActiveTab(tabName) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const active = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
+  if (active) active.classList.add('active');
+}
+
+// Highlight the correct tab when scrolling past its section
+function updateActiveTabOnScroll() {
+  const sections = ['movies-row', 'tvshows-row', 'anime-row'];
+  let active = 'home';
+  for (const id of sections) {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 160) active = el.id.replace('-row', '');
+  }
+  const tabName = active === 'movies' ? 'movies' : active === 'tvshows' ? 'tv' : active === 'anime' ? 'anime' : 'home';
+  setActiveTab(tabName);
+}
+window.addEventListener('scroll', updateActiveTabOnScroll);
+
 // Navbar scroll effect
 window.addEventListener('scroll', () => {
   const navbar = document.getElementById('navbar');
