@@ -1078,9 +1078,47 @@ a.logo-link {
     font-size: 10px;
   }
   
-  .search-bar {
-    width: 80px;
+  /* Navbar search collapses: stacked search bar + type dropdown on small screens */
+  .search-bar-wrap {
+    flex-direction: column;
+    border: none;
+    background: transparent;
+  }
+
+  .search-bar-wrap .search-bar {
+    width: 70px;
     font-size: 11px;
+  }
+
+  .search-type-filter {
+    border-left: none;
+    border-top: 1px solid rgba(255,255,255,0.5);
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    background: rgba(0,0,0,0.75);
+  }
+
+  .search-modal {
+    padding-top: 20px;
+  }
+
+  .search-modal input {
+    font-size: 16px; /* prevents iOS zoom on focus */
+  }
+
+  .search-filters select {
+    font-size: 16px;
+    padding: 12px 12px;
+  }
+
+  .suggestion-row img {
+    width: 80px;
+    height: 45px;
+  }
+
+  .suggestion-title {
+    font-size: 14px;
   }
   
   .banner {
@@ -1092,7 +1130,15 @@ a.logo-link {
   }
   
   .banner p {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+  }
+
+  .search-filters {
+    flex-direction: column;
+  }
+
+  .search-modal .suggestions {
+    width: 90%;
   }
 
   .btn {

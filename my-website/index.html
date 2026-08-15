@@ -22,7 +22,7 @@
     <a href="#tvshows-row" class="nav-tab" data-tab="tv" onclick="scrollToSection(event)">TV Shows</a>
     <a href="#anime-row" class="nav-tab" data-tab="anime" onclick="scrollToSection(event)">Anime</a>
     <div class="search-bar-wrap" onclick="openSearchModal()">
-    <input type="text" class="search-bar" placeholder="Search..." readonly />
+    <input type="text" class="search-bar" placeholder="Search..." readonly onfocus="this.blur(); openSearchModal()" />
     <select id="search-type-filter" class="search-type-filter" onclick="event.stopPropagation()" onchange="quickFilter(this.value)">
       <option value="">All</option>
       <option value="movie">Movies</option>
