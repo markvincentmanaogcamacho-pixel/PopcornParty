@@ -8,6 +8,8 @@
   <link rel="preload" href="js/home.js" as="script">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script defer src="js/playerConfig.js"></script>
+  <script defer src="js/playerManager.js"></script>
   <script defer src="js/home.js"></script>
 </head>
 
@@ -124,16 +126,22 @@
       <div class="server-selector" id="server-selector">
   <label for="server">Server:</label>
   <select id="server" onchange="changeServer()">
-    <option value="vidsrc.pro">Vidsrc Pro (Best Subs)</option>
-    <option value="vidsrc.me">Vidsrc.me</option>
-    <option value="vidsrc.cc">Vidsrc.cc</option>
-    <option value="multiembed">MultiEmbed</option>
-    <option value="2embed">2Embed</option>
-    <option value="autoembed">AutoEmbed</option>
-    <option value="player.videasy.net">Videasy</option>
+    <!-- Options are rendered by js/playerConfig.js -->
   </select>
+  <button type="button" class="btn btn-switch" onclick="retryNextServer()" title="Try the next working server">
+    <i class="fas fa-rotate"></i> Switch Server
+  </button>
 </div>
-      
+
+      <div class="player-status" id="player-status">
+        <p><i class="fas fa-triangle-exclamation"></i> This server is not responding. Please switch to another server or try again.</p>
+      </div>
+
+      <div class="player-spinner" id="player-spinner">
+        <div class="spinner-ring"></div>
+        <span>Loading player…</span>
+      </div>
+
       <iframe id="modal-video" allowfullscreen></iframe>
     </div>
   </div>

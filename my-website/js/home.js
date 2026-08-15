@@ -267,6 +267,7 @@ async function showDetails(item) {
     episodeSelector.style.display = 'none';
   }
   
+  renderProviderOptions();
   changeServer();
   document.getElementById('modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -355,95 +356,25 @@ function onEpisodeChange() {
   changeServer();
 }
 
-function changeServer() {
-  const server = document.getElementById('server').value;
-  const isTVShow = currentItem.media_type === "tv" || currentItem.first_air_date;
-  const type = isTVShow ? "tv" : "movie";
-  let embedURL = "";
-  
-  const tmdbId = currentItem.id;
+/* -----------------------------------------------------------------
+   Player servers are now managed by js/playerConfig.js and
+   js/playerManager.js: provider URLs live in one configuration
+   object, and the manager handles loading states, timeouts,
+   automatic fallback, and remembering the user's preferred source.
+   ----------------------------------------------------------------- */
+// The old changeServer() was replaced by the loadPlayer() pipeline.
+// changeServer() remains as the public onchange callback used by
+// index.html and still routes through the new player manager.
 
-  if (isTVShow) {
-    const season = document.getElementById('season-select').value;
-    const episode = document.getElementById('episode-select').value;
-    
-    switch(server) {
-      case "vidsrc.pro":
-        // Vidsrc Pro - Best subtitle support
-        embedURL = `https://vidsrc.pro/embed/${type}/${tmdbId}/${season}/${episode}`;
-        break;
-        
-      case "vidsrc.me":
-        embedURL = `https://vidsrc.me/embed/${type}?tmdb=${tmdbId}&season=${season}&episode=${episode}`;
-        break;
-        
-      case "vidsrc.cc":
-        embedURL = `https://vidsrc.cc/v2/embed/${type}/${tmdbId}/${season}/${episode}`;
-        break;
-        
-      case "multiembed":
-        embedURL = `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`;
-        break;
-        
-      case "2embed":
-        embedURL = `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`;
-        break;
-        
-      case "autoembed":
-        embedURL = `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`;
-        break;
-        
-      case "player.videasy.net":
-        embedURL = `https://player.videasy.net/${type}/${tmdbId}/${season}/${episode}`;
-        break;
-        
-      default:
-        embedURL = `https://vidsrc.pro/embed/${type}/${tmdbId}/${season}/${episode}`;
-    }
-  } else {
-    // Movies
-    switch(server) {
-      case "vidsrc.pro":
-        // Vidsrc Pro - Best subtitle support
-        embedURL = `https://vidsrc.pro/embed/movie/${tmdbId}`;
-        break;
-        
-      case "vidsrc.me":
-        embedURL = `https://vidsrc.me/embed/movie?tmdb=${tmdbId}`;
-        break;
-        
-      case "vidsrc.cc":
-        embedURL = `https://vidsrc.cc/v2/embed/movie/${tmdbId}`;
-        break;
-        
-      case "multiembed":
-        embedURL = `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
-        break;
-        
-      case "2embed":
-        embedURL = `https://www.2embed.cc/embed/${tmdbId}`;
-        break;
-        
-      case "autoembed":
-        embedURL = `https://player.autoembed.cc/embed/movie/${tmdbId}`;
-        break;
-        
-      case "player.videasy.net":
-        embedURL = `https://player.videasy.net/movie/${tmdbId}`;
-        break;
-        
-      default:
-        embedURL = `https://vidsrc.pro/embed/movie/${tmdbId}`;
-    }
-  }
-
-  console.log('Loading:', embedURL); // For debugging
-  document.getElementById('modal-video').src = embedURL;
+function closePlayer() {
+  const iframe = document.getElementById('modal-video');
+  if (iframe) iframe.src = '';
+  showPlayerState ? showPlayerState('idle') : undefined;
 }
 
 function closeModal() {
   document.getElementById('modal').style.display = 'none';
-  document.getElementById('modal-video').src = '';
+  closePlayer();
   document.body.style.overflow = 'auto';
   currentSeasons = [];
 }
