@@ -428,6 +428,7 @@ function showBannerInfo() {
 }
 
 function openSearchModal() {
+  populateSearchFilters();
   document.getElementById('search-modal').style.display = 'flex';
   document.getElementById('search-input').focus();
   document.body.style.overflow = 'hidden';
@@ -436,6 +437,7 @@ function openSearchModal() {
 function closeSearchModal() {
   document.getElementById('search-modal').style.display = 'none';
   document.getElementById('search-results').innerHTML = '';
+  document.getElementById('search-suggestions').style.display = 'none';
   document.getElementById('search-input').value = '';
   document.body.style.overflow = 'auto';
 }
@@ -446,20 +448,152 @@ function closeSearchModalOnBackdrop(event) {
   }
 }
 
-async function searchTMDB() {
+/* ---------- Advanced search: filters + live suggestions ---------- */
+let lastSearchResults = [];
+let searchDebounceTimer = null;
+let suggestionDebounceTimer = null;
+let currentSearchQuery = '';
+
+// Genre list shared by the filter dropdown and results
+const GENRES = [
+  { id: 28, name: 'Action' }, { id: 12, name: 'Adventure' }, { id: 16, name: 'Animation' },
+  { id: 35, name: 'Comedy' }, { id: 80, name: 'Crime' }, { id: 18, name: 'Drama' },
+  { id: 27, name: 'Horror' }, { id: 10749, name: 'Romance' }, { id: 878, name: 'Sci-Fi' },
+  { id: 99, name: 'Documentary' }, { id: 53, name: 'Thriller' }, { id: 10752, name: 'War' }
+];
+
+// Prepopulate genre and year dropdowns when the modal opens
+function populateSearchFilters() {
+  const genreSelect = document.getElementById('filter-genre');
+  if (genreSelect && genreSelect.options.length <= 1) {
+    GENRES.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g.id;
+      opt.textContent = g.name;
+      genreSelect.appendChild(opt);
+    });
+  }
+  const yearSelect = document.getElementById('filter-year');
+  if (yearSelect && yearSelect.options.length <= 1) {
+    const currentYear = new Date().getFullYear();
+    for (let y = currentYear; y >= currentYear - 25; y--) {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y;
+      yearSelect.appendChild(opt);
+    }
+  }
+}
+
+// Debounced typing: suggestions first, then full search
+function onSearchInput() {
+  clearTimeout(suggestionDebounceTimer);
+  clearTimeout(searchDebounceTimer);
   const query = document.getElementById('search-input').value;
+  currentSearchQuery = query;
+
   if (!query.trim()) {
+    document.getElementById('search-suggestions').style.display = 'none';
     document.getElementById('search-results').innerHTML = '';
+    lastSearchResults = [];
     return;
   }
 
-  const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${query}`);
-  const data = await res.json();
+  // Live suggestions appear quickly (250ms)
+  suggestionDebounceTimer = setTimeout(() => fetchSuggestions(query), 250);
+  // Full poster-grid search follows after 500ms of no typing
+  searchDebounceTimer = setTimeout(() => applySearchFilters(), 500);
+}
 
+async function fetchSuggestions(query) {
+  try {
+    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+    const data = await res.json();
+    renderSuggestions(data.results || []);
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+  }
+}
+
+function renderSuggestions(items) {
+  const box = document.getElementById('search-suggestions');
+  const shown = items
+    .filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && item.title || item.name)
+    .slice(0, 6);
+  if (shown.length === 0) {
+    box.style.display = 'none';
+    return;
+  }
+  box.innerHTML = '';
+  shown.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'suggestion-row';
+    const title = item.title || item.name;
+    const year = (item.release_date || item.first_air_date || '').substring(0, 4);
+    row.innerHTML = `<img src="${IMG_URL}${item.backdrop_path || item.poster_path}" alt="" loading="lazy" />
+      <div class="suggestion-info"><span class="suggestion-title">${title}</span>
+      <span class="suggestion-meta">${item.media_type === 'tv' ? 'TV Show' : 'Movie'}${year ? ' · ' + year : ''}</span></div>`;
+    row.onclick = () => {
+      document.getElementById('search-input').value = title;
+      closeSearchModal();
+      showDetails(item);
+    };
+    box.appendChild(row);
+  });
+  box.style.display = 'block';
+}
+
+// Combined filter application (type + genre + year)
+async function applySearchFilters() {
+  const query = document.getElementById('search-input').value;
+  if (!query.trim()) {
+    document.getElementById('search-results').innerHTML = '';
+    lastSearchResults = [];
+    return;
+  }
+  document.getElementById('search-suggestions').style.display = 'none';
+  const type = document.getElementById('filter-type').value;
+  const genre = document.getElementById('filter-genre').value;
+  const year = document.getElementById('filter-year').value;
+
+  // Anime quick filter: TV shows flagged as Japanese animation
+  const isAnime = type === 'anime';
+  const searchType = type ? (isAnime ? 'tv' : type) : 'multi';
+
+  try {
+    let url = `${BASE_URL}/search/${searchType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
+    if (year) url += `&${type === 'tv' || !type ? 'first_air_date_year' : 'year'}=${year}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    let results = data.results || [];
+
+    // Client-side genre filter (search API doesn't filter genres reliably)
+    if (genre) {
+      results = results.filter(item =>
+        (item.genre_ids || []).map(Number).includes(Number(genre))
+      );
+    }
+    // Anime flag filter (TV shows originally in Japanese with Animation genre)
+    if (isAnime) {
+      results = results.filter(item =>
+        item.original_language === 'ja' && (item.genre_ids || []).map(Number).includes(16)
+      );
+    }
+    lastSearchResults = results;
+    renderSearchResults(results);
+  } catch (error) {
+    console.error('Error applying search filters:', error);
+  }
+}
+
+function renderSearchResults(results) {
   const container = document.getElementById('search-results');
   container.innerHTML = '';
-  
-  data.results.forEach(item => {
+  if (results.length === 0) {
+    container.innerHTML = '<p class="no-results">No results found. Try a different title or filter.</p>';
+    return;
+  }
+  results.forEach(item => {
     if (!item.poster_path) return;
     const img = document.createElement('img');
     img.src = `${IMG_URL}${item.poster_path}`;
@@ -471,6 +605,17 @@ async function searchTMDB() {
     };
     container.appendChild(img);
   });
+}
+
+// Navbar quick filter dropdown
+function quickFilter(type) {
+  document.getElementById('search-type-filter').value = '';
+  openSearchModal();
+  document.getElementById('filter-type').value = type === 'anime' ? 'tv' : type;
+  document.getElementById('search-input').focus();
+  if (type === 'anime') {
+    document.getElementById('search-input').placeholder = 'Search anime titles...';
+  }
 }
 
 // ========== MY LIST FUNCTIONALITY ==========
@@ -534,9 +679,8 @@ function getWatchProgress(itemId, mediaType) {
   return watchProgress[key] || null;
 }
 // ========== GENRE FUNCTIONALITY ==========
-
 // Genre IDs from TMDB API
-const GENRES = {
+const GENRE_IDS = {
   action: 28,
   comedy: 35,
   horror: 27,
@@ -580,16 +724,16 @@ async function init() {
   displayList(anime, 'anime-list');
   
   // ADD THESE LINES FOR GENRE CATEGORIES:
-  const action = await fetchByGenre(GENRES.action);
+  const action = await fetchByGenre(GENRE_IDS.action);
   displayList(action, 'action-list');
   
-  const comedy = await fetchByGenre(GENRES.comedy);
+  const comedy = await fetchByGenre(GENRE_IDS.comedy);
   displayList(comedy, 'comedy-list');
   
-  const horror = await fetchByGenre(GENRES.horror);
+  const horror = await fetchByGenre(GENRE_IDS.horror);
   displayList(horror, 'horror-list');
   
-  const romance = await fetchByGenre(GENRES.romance);
+  const romance = await fetchByGenre(GENRE_IDS.romance);
   displayList(romance, 'romance-list');
 }
 

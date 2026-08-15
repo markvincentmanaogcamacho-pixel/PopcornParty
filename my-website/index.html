@@ -21,7 +21,15 @@
     <a href="#movies-row" class="nav-tab" data-tab="movies" onclick="scrollToSection(event)">Movies</a>
     <a href="#tvshows-row" class="nav-tab" data-tab="tv" onclick="scrollToSection(event)">TV Shows</a>
     <a href="#anime-row" class="nav-tab" data-tab="anime" onclick="scrollToSection(event)">Anime</a>
-    <input type="text" class="search-bar" placeholder="Search..." onfocus="openSearchModal()" />
+    <div class="search-bar-wrap" onclick="openSearchModal()">
+    <input type="text" class="search-bar" placeholder="Search..." readonly />
+    <select id="search-type-filter" class="search-type-filter" onclick="event.stopPropagation()" onchange="quickFilter(this.value)">
+      <option value="">All</option>
+      <option value="movie">Movies</option>
+      <option value="tv">TV Shows</option>
+      <option value="anime">Anime</option>
+    </select>
+  </div>
   </nav>
 </header>
 
@@ -149,7 +157,21 @@
 
   <div class="search-modal" id="search-modal" onclick="closeSearchModalOnBackdrop(event)">
   <span class="close" onclick="closeSearchModal()">&times;</span>
-  <input type="text" id="search-input" placeholder="Titles, people, genres..." oninput="searchTMDB()" />
+  <input type="text" id="search-input" placeholder="Titles, people, genres..." oninput="onSearchInput()" />
+  <div class="search-filters">
+    <select id="filter-type" onchange="applySearchFilters()">
+      <option value="">All Types</option>
+      <option value="movie">Movies</option>
+      <option value="tv">TV Shows</option>
+    </select>
+    <select id="filter-genre" onchange="applySearchFilters()">
+      <option value="">All Genres</option>
+    </select>
+    <select id="filter-year" onchange="applySearchFilters()">
+      <option value="">Any Year</option>
+    </select>
+  </div>
+  <div class="suggestions" id="search-suggestions" style="display: none;"></div>
   <div class="results" id="search-results"></div>
 </div>
 
