@@ -514,27 +514,22 @@ body {
   background: rgba(0,0,0,0.9);
 }
 
-.server-selector {
-  margin: 20px 0;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.server-selector label {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.server-selector select {
-  padding: 8px 15px;
+/* Region selector in the navbar */
+#region-select {
+  padding: 8px 12px;
   border-radius: 4px;
-  border: 1px solid #333;
-  background: #2a2a2a;
+  border: 1px solid rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.75);
   color: white;
-  font-size: 14px;
-  cursor: pointer;
+  font-size: 13px;
   outline: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+#region-select:focus {
+  border-color: white;
+  background: rgba(0,0,0,0.9);
 }
 /* Episode Selector - Netflix Style */
 .episode-selector {
@@ -583,47 +578,118 @@ body {
   background: #333;
 }
 
-/* Update server selector to match */
-.server-selector {
-  margin: 20px 0;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 15px 20px;
+/* ---------- Where to Watch (legal streaming providers) ---------- */
+.watch-providers {
+  margin: 24px 0 8px;
+  padding: 20px;
   background: rgba(255,255,255,0.03);
   border-radius: 8px;
 }
 
-.server-selector label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #e5e5e5;
+.watch-heading {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin: 0 0 16px;
 }
 
-.server-selector select {
-  padding: 10px 15px;
-  border-radius: 4px;
-  border: 1px solid #333;
-  background: #2a2a2a;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  outline: none;
-  flex: 1;
-  max-width: 250px;
-  transition: all 0.3s;
+.watch-section h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #b3b3b3;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 14px 0 8px;
 }
 
-.server-selector select:hover {
-  background: #333;
-  border-color: #555;
+.watch-section h4:first-child {
+  margin-top: 0;
 }
 
-.server-selector select:focus {
+.watch-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.watch-provider {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #3a3a3a;
+  background: #222;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.watch-provider:hover {
+  background: #e50914;
   border-color: #e50914;
-  background: #333;
+  transform: translateY(-1px);
+}
+
+.watch-provider img {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.watch-loading,
+.watch-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 6px;
+  color: #d2d2d2;
+  font-size: 14px;
+}
+
+.watch-empty i {
+  color: #e50914;
+}
+
+.watch-full-page {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #3a3a3a;
+  background: #222;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.watch-full-page:hover {
+  background: #e50914;
+  border-color: #e50914;
+}
+
+.watch-attribution,
+.footer-attribution {
+  margin-top: 14px;
+  font-size: 11px;
+  color: #777;
+}
+
+.watch-attribution a,
+.footer-attribution a {
+  color: #999;
+  text-decoration: underline;
 }
 
 /* Responsive adjustments */
@@ -633,94 +699,14 @@ body {
     gap: 15px;
     padding: 15px;
   }
-  
-  .server-selector {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
+
+  #region-select {
+    max-width: 120px;
   }
-  
-  .server-selector select {
-    max-width: 100%;
-  }
-}
-.modal iframe {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  height: auto;
-  min-height: 300px;
-  max-height: 70vh;
-  border-radius: 4px;
-  margin-top: 20px;
-  background: #000;
-}
 
-/* ---------- Player loading spinner ---------- */
-.player-spinner {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 20px;
-  padding: 30px;
-  background: #111;
-  border-radius: 4px;
-  color: #d2d2d2;
-  font-size: 14px;
-}
-
-.spinner-ring {
-  width: 26px;
-  height: 26px;
-  border: 3px solid rgba(229, 9, 20, 0.25);
-  border-top-color: #e50914;
-  border-radius: 50%;
-  animation: player-spin 0.9s linear infinite;
-}
-
-@keyframes player-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ---------- Player error / status state ---------- */
-.player-status {
-  display: none;
-  margin-top: 20px;
-  padding: 16px 20px;
-  background: rgba(229, 9, 20, 0.1);
-  border: 1px solid rgba(229, 9, 20, 0.4);
-  border-radius: 4px;
-  color: #f5f5f5;
-  font-size: 14px;
-}
-
-.player-status i {
-  color: #e50914;
-  margin-right: 8px;
-}
-
-/* ---------- Manual server switch button ---------- */
-.btn-switch {
-  padding: 8px 14px;
-  border-radius: 4px;
-  border: 1px solid #444;
-  background: #2a2a2a;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-switch:hover {
-  background: #e50914;
-  border-color: #e50914;
-}
-
-@media (max-width: 768px) {
-  .modal iframe {
-    min-height: 220px;
-    max-height: 55vh;
+  .watch-provider {
+    font-size: 12px;
+    padding: 6px 10px;
   }
 }
 

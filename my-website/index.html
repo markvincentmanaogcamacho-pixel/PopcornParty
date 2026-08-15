@@ -8,8 +8,7 @@
   <link rel="preload" href="js/home.js" as="script">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script defer src="js/playerConfig.js"></script>
-  <script defer src="js/playerManager.js"></script>
+  <script defer src="js/watchProviders.js"></script>
   <script defer src="js/home.js"></script>
 </head>
 
@@ -22,6 +21,7 @@
     <a href="#">TV Shows</a>
     <a href="#">Anime</a>
     <input type="text" class="search-bar" placeholder="Search..." onfocus="openSearchModal()" />
+    <select id="region-select" onchange="onRegionChange()" title="Streaming region"></select>
   </nav>
 </header>
 
@@ -31,7 +31,7 @@
     <p id="banner-description"></p>
     <div class="banner-buttons">
       <button class="btn btn-play" onclick="playBanner()">
-        <i class="fas fa-play"></i> Play
+        <i class="fas fa-play"></i> Find Where to Watch
       </button>
       <button class="btn btn-info" onclick="showBannerInfo()">
         <i class="fas fa-info-circle"></i> More Info
@@ -123,26 +123,10 @@
         </div>
       </div>
       
-      <div class="server-selector" id="server-selector">
-  <label for="server">Server:</label>
-  <select id="server" onchange="changeServer()">
-    <!-- Options are rendered by js/playerConfig.js -->
-  </select>
-  <button type="button" class="btn btn-switch" onclick="retryNextServer()" title="Try the next working server">
-    <i class="fas fa-rotate"></i> Switch Server
-  </button>
-</div>
-
-      <div class="player-status" id="player-status">
-        <p><i class="fas fa-triangle-exclamation"></i> This server is not responding. Please switch to another server or try again.</p>
+      <!-- Where to Watch: legal streaming availability (JustWatch via TMDB) -->
+      <div class="watch-providers" id="watch-providers">
+        <h3 class="watch-heading">Where to Watch</h3>
       </div>
-
-      <div class="player-spinner" id="player-spinner">
-        <div class="spinner-ring"></div>
-        <span>Loading player…</span>
-      </div>
-
-      <iframe id="modal-video" allowfullscreen></iframe>
     </div>
   </div>
 </div>
@@ -163,9 +147,11 @@
       <a href="#">Cookie Preferences</a>
       <a href="#">Contact Us</a>
     </div>
+    <p class="footer-attribution">Streaming availability data by <a href="https://www.justwatch.com" target="_blank" rel="noopener noreferrer">JustWatch</a> · Movie data by <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer">TMDB</a></p>
     <p>&copy; 2025 Popcorn Party. All rights reserved.</p>
   </div>
 </footer>
 
   
 </body>
+</html>

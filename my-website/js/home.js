@@ -146,7 +146,7 @@ function createHoverCard(item, containerDiv) {
           </div>
           <p class="hover-card-description">${description}</p>
           <div class="hover-card-buttons">
-            <button title="Play">
+            <button title="Find where to watch">
               <i class="fas fa-play"></i>
             </button>
             <button title="Add to My List">
@@ -248,7 +248,6 @@ async function showDetails(item) {
   
   // Show/hide season/episode selectors based on content type
   const episodeSelector = document.getElementById('episode-selector');
-  const serverSelector = document.getElementById('server-selector');
   
   if (isTVShow) {
     // Fetch TV show details to get seasons
@@ -267,8 +266,8 @@ async function showDetails(item) {
     episodeSelector.style.display = 'none';
   }
   
-  renderProviderOptions();
-  changeServer();
+  if (typeof renderRegionSelector === 'function') renderRegionSelector();
+  renderWatchProviders(item);
   document.getElementById('modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
@@ -340,8 +339,6 @@ async function loadEpisodes(tvId, seasonNumber) {
       episodeSelect.appendChild(option);
     });
     
-    // Automatically load first episode
-    changeServer();
   } else {
     episodeSelect.innerHTML = '<option>No episodes found</option>';
   }
@@ -353,28 +350,21 @@ async function onSeasonChange() {
 }
 
 function onEpisodeChange() {
-  changeServer();
+  // Refresh season info on the TMDB page the user lands on
+  if (typeof renderWatchProviders === 'function' && currentItem) {
+    renderWatchProviders(currentItem);
+  }
 }
 
 /* -----------------------------------------------------------------
-   Player servers are now managed by js/playerConfig.js and
-   js/playerManager.js: provider URLs live in one configuration
-   object, and the manager handles loading states, timeouts,
-   automatic fallback, and remembering the user's preferred source.
+   Legal streaming availability is managed by js/watchProviders.js:
+   the modal now shows where a title streams, rents, or is sold on
+   official platforms (JustWatch data via TMDB) instead of loading
+   third-party embed players.
    ----------------------------------------------------------------- */
-// The old changeServer() was replaced by the loadPlayer() pipeline.
-// changeServer() remains as the public onchange callback used by
-// index.html and still routes through the new player manager.
-
-function closePlayer() {
-  const iframe = document.getElementById('modal-video');
-  if (iframe) iframe.src = '';
-  showPlayerState ? showPlayerState('idle') : undefined;
-}
 
 function closeModal() {
   document.getElementById('modal').style.display = 'none';
-  closePlayer();
   document.body.style.overflow = 'auto';
   currentSeasons = [];
 }
