@@ -265,6 +265,25 @@ function addScrollButtons(containerId) {
   });
 }
 
+async function recordWatchStart(item) {
+  const isTV = item.media_type === 'tv' || item.first_air_date;
+  const type = isTV ? 'tv' : 'movie';
+  const key = `${item.id}-${type}`;
+  const existing = watchProgress[key] || { id: item.id, mediaType: type, currentTime: 0, duration: 0, percentage: 0, timestamp: 0 };
+  existing.timestamp = Date.now();
+  // Remember the season/episode the viewer was on (TV) so resume means the same episode
+  if (isTV) {
+    const seasonEl = document.getElementById('season-select');
+    const episodeEl = document.getElementById('episode-select');
+    if (seasonEl) existing.season = parseInt(seasonEl.value, 10) || existing.season || 1;
+    if (episodeEl) existing.episode = parseInt(episodeEl.value, 10) || existing.episode || 1;
+  }
+  watchProgress[key] = existing;
+  localStorage.setItem('watchProgress', JSON.stringify(watchProgress));
+}
+
+let modalOpenSince = 0;
+
 async function showDetails(item) {
   currentItem = item;
   const isTVShow = item.media_type === "tv" || item.first_air_date;
@@ -290,7 +309,21 @@ async function showDetails(item) {
       
       // Load first season's episodes
       if (currentSeasons.length > 0) {
-        await loadEpisodes(item.id, currentSeasons[0].season_number);
+        // Resume: if the visitor came from Continue Watching, open the
+        // exact season/episode they were last watching.
+        const savedSeason = item._savedSeason || 1;
+        const season = currentSeasons.find(s => s.season_number === savedSeason) || currentSeasons[0];
+        if (season.season_number !== currentSeasons[0].season_number) {
+          document.getElementById('season-select').value = season.season_number;
+        }
+        await loadEpisodes(item.id, season.season_number);
+        // After episodes load, select the saved episode if it exists
+        if (item._savedEpisode) {
+          const epSelect = document.getElementById('episode-select');
+          if (epSelect && [...epSelect.options].some(o => o.value === String(item._savedEpisode))) {
+            epSelect.value = String(item._savedEpisode);
+          }
+        }
       }
     }
   } else {
@@ -301,6 +334,8 @@ async function showDetails(item) {
   changeServer();
   document.getElementById('modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  recordWatchStart(item);
+  modalOpenSince = Date.now();
 }
 
 function populateSeasonSelector(seasons) {
@@ -342,8 +377,13 @@ async function displayContinueWatching() {
       try {
         const type = progress.mediaType || 'movie';
         const res = await fetch(`${BASE_URL}/${type}/${progress.id}?api_key=${API_KEY}`);
+        if (!res.ok) return null;
         const item = await res.json();
         item.media_type = type;
+        // Attach the saved season/episode so the row can resume at the
+        // right place instead of always opening at S1E1.
+        item._savedSeason = progress.season || null;
+        item._savedEpisode = progress.episode || null;
         return item;
       } catch (error) {
         console.error('Error fetching continue watching item:', error);
@@ -354,6 +394,14 @@ async function displayContinueWatching() {
   
   const validItems = fullItems.filter(item => item !== null);
   displayList(validItems, 'continue-watching-list');
+}
+
+// Clear the Continue Watching history (called from the section's × button)
+function clearContinueWatching() {
+  watchProgress = {};
+  localStorage.removeItem('watchProgress');
+  const row = document.getElementById('continue-watching-row');
+  if (row) row.style.display = 'none';
 }
 async function loadEpisodes(tvId, seasonNumber) {
   const episodeSelect = document.getElementById('episode-select');
@@ -402,7 +450,29 @@ function closePlayer() {
   showPlayerState ? showPlayerState('idle') : undefined;
 }
 
+/* Finish a watch session: convert the time the modal was open into an
+   approximate watched percentage using the title's runtime (TMDB minutes).
+   We cap growth so repeatedly opening/closing doesn't invent progress. */
+function finishWatchSession() {
+  if (!currentItem || !modalOpenSince) return;
+  const elapsedMs = Math.min(Date.now() - modalOpenSince, 6 * 3600 * 1000); // sane cap
+  const minutesWatched = elapsedMs / 60000;
+  const isTV = currentItem.media_type === 'tv' || currentItem.first_air_date;
+  const type = isTV ? 'tv' : 'movie';
+  const runtime = (currentItem.runtime || currentItem.episode_run_time?.[0] || 22);
+  const key = `${currentItem.id}-${type}`;
+  const entry = watchProgress[key] || { id: currentItem.id, mediaType: type, currentTime: 0, duration: runtime, percentage: 0, timestamp: Date.now() };
+  entry.duration = runtime;
+  const addedPct = Math.min((minutesWatched / runtime) * 100, 100);
+  entry.percentage = Math.min((entry.percentage || 0) + addedPct, 99.9);
+  entry.timestamp = Date.now();
+  watchProgress[key] = entry;
+  localStorage.setItem('watchProgress', JSON.stringify(watchProgress));
+}
+
 function closeModal() {
+  finishWatchSession();
+  modalOpenSince = 0;
   document.getElementById('modal').style.display = 'none';
   closePlayer();
   document.body.style.overflow = 'auto';

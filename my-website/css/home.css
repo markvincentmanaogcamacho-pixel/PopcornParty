@@ -1372,3 +1372,52 @@ a.logo-link {
     right: 8px;
   }
 }
+
+/* ============ Mobile: trim long rows ============
+   On small screens a 20-item row forces a lot of scrolling.
+   We keep the first 10 posters visible per row and let users
+   discover the rest via Search (which already supports all filters). */
+@media (max-width: 480px) {
+  .list .list-item:nth-child(n+11) {
+    display: none;
+  }
+  /* Genre rows get one line only on small phones (keep Continue Watching
+     and My List slightly longer so there's something to resume) */
+  .row:not(#continue-watching-row):not(#mylist-row) .list .list-item:nth-child(n+7) {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) and (min-width: 481px) {
+  .list .list-item:nth-child(n+15) {
+    display: none;
+  }
+}
+
+/* Clear-history × button next to section headings */
+.clear-history {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-left: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  color: #999;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  vertical-align: middle;
+}
+
+.clear-history:hover {
+  background: #e50914;
+  color: #fff;
+}
+
+.row h2 {
+  display: flex;
+  align-items: center;
+}
