@@ -1,0 +1,19 @@
+{
+  "name": "Popcorn Party",
+  "short_name": "PopcornParty",
+  "description": "Browse trending movies, TV shows and anime. A personal project for learning web development.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#141414",
+  "theme_color": "#e50914",
+  "lang": "en",
+  "categories": ["entertainment"],
+  "icons": [
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192x192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512x512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

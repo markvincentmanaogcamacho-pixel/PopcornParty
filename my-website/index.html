@@ -1,4 +1,5 @@
 <html lang="en">
+<!-- PWA: installable app manifest + service worker (see manifest.json, sw.js) -->
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -7,10 +8,27 @@
   <link rel="preload" href="css/home.css" as="style">
   <link rel="preload" href="js/home.js" as="script">
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PopcornParty">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#e50914">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script defer src="js/playerConfig.js"></script>
   <script defer src="js/playerManager.js"></script>
   <script defer src="js/home.js"></script>
+  <!-- PWA: register service worker for offline app shell -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js", { scope: "/" })
+          .then((reg) => console.log("SW registered", reg.scope))
+          .catch((err) => console.warn("SW registration failed", err));
+      });
+    }
+  </script>
 </head>
 
 <body>
@@ -45,6 +63,18 @@
         <i class="fas fa-info-circle"></i> More Info
       </button>
     </div>
+  </div>
+</div>
+
+  <!-- PWA install prompt banner -->
+<div class="install-banner" id="install-banner" style="display: none;">
+  <div class="install-banner-content">
+    <img src="icons/icon-192x192.png" alt="Popcorn Party icon" class="install-icon" />
+    <div>
+      <strong>Install Popcorn Party</strong>
+      <span>Get it on your home screen for app-like access.</span>
+    </div>
+    <button class="btn btn-install" id="install-btn" onclick="dismissInstallBanner()"><i class="fas fa-times"></i></button>
   </div>
 </div>
 

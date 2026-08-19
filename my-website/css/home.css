@@ -1199,3 +1199,68 @@ a.logo-link {
 ::-webkit-scrollbar-thumb:hover {
   background: #888;
 }
+
+/* ============ PWA install banner ============ */
+.install-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10001;
+  background: linear-gradient(135deg, #7a0a10, #e50914);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+.install-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  color: #fff;
+}
+
+.install-banner-content .install-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.install-banner-content strong {
+  display: block;
+  font-size: 15px;
+}
+
+.install-banner-content span {
+  display: block;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.install-banner-content .btn-install {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.install-banner-content .btn-install:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 480px) {
+  .install-banner-content strong { font-size: 14px; }
+  .install-banner-content span { font-size: 11px; }
+}

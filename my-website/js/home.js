@@ -738,3 +738,65 @@ async function init() {
 }
 
 init();
+
+/* ============ PWA install prompt ============ */
+let deferredPrompt = null;
+
+function installPopcornParty() {
+  if (!deferredPrompt) return false;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then((choice) => {
+    if (choice.outcome === "accepted") {
+      console.log("User installed the app");
+    }
+    deferredPrompt = null;
+    hideInstallBanner();
+  });
+  return true;
+}
+
+function showInstallBanner() {
+  const banner = document.getElementById("install-banner");
+  const btn = document.getElementById("install-btn");
+  if (!banner) return;
+  banner.style.display = "block";
+  if (deferredPrompt) {
+    // Android/Chrome: the button installs the app
+    btn.innerHTML = '<i class="fas fa-download"></i>';
+    btn.title = "Install app";
+    btn.onclick = () => installPopcornParty();
+  } else {
+    // iOS/Safari: the prompt cannot be captured; give manual instructions
+    btn.innerHTML = '<i class="fas fa-times"></i>';
+    btn.title = "Dismiss";
+    btn.onclick = () => dismissInstallBanner();
+    const text = banner.querySelector("span");
+    if (text) text.textContent = "Tap Share, then Add to Home Screen to install.";
+  }
+}
+
+function hideInstallBanner() {
+  const banner = document.getElementById("install-banner");
+  if (banner) banner.style.display = "none";
+}
+
+function dismissInstallBanner() {
+  hideInstallBanner();
+  try { sessionStorage.setItem("pp-install-dismissed", "1"); } catch (e) {}
+}
+
+// Capture the beforeinstallprompt event (Chromium desktop/Android)
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredPrompt = event;
+  try {
+    if (sessionStorage.getItem("pp-install-dismissed")) return;
+  } catch (e) {}
+  setTimeout(showInstallBanner, 3000);
+});
+
+// Already installed (standalone mode): never show the banner
+if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
+  const b = document.getElementById("install-banner");
+  if (b) b.remove();
+}
