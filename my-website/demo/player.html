@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player Demo — Learning Player-Server Architecture</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <link rel="stylesheet" href="player.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <a href="../index.html" class="back-link">&larr; Back to Popcorn Party</a>
+    <span class="nav-title">Player Demo</span>
+  </nav>
+
+  <main class="demo">
+    <section class="intro">
+      <h1>How a player-server aggregator works</h1>
+      <p>This demo shows the same <strong>player-manager pattern</strong> used by sites that aggregate
+      multiple streaming servers — built here with <strong>legally licensed media</strong>
+      (Blender Foundation open movies and sample videos from test-videos.co.uk) so it can be
+      studied and shared freely. It demonstrates four concepts:</p>
+      <ul>
+        <li><strong>Multi-source configuration</strong> — servers are data, not code: each has a name,
+        a URL builder, and a priority rank.</li>
+        <li><strong>Adaptive streaming (HLS)</strong> — one master playlist lets the player switch
+        between 360p / 720p / 1080p based on bandwidth.</li>
+        <li><strong>Fallback chain</strong> — if the highest-priority source fails to start within a
+        timeout, the manager automatically tries the next source, and shows a clear error state
+        when all sources fail.</li>
+        <li><strong>Telemetry</strong> — anonymous client-side logging of startup time, fallbacks,
+        and source health (no personal data is collected).</li>
+      </ul>
+    </section>
+
+    <section class="player-stage">
+      <div class="player-frame" id="player-frame">
+        <video id="video" playsinline></video>
+        <div class="overlay" id="overlay">
+          <div class="spinner"></div>
+          <p id="overlay-text">Loading…</p>
+          <button class="retry-btn" id="retry-btn" style="display:none" onclick="retryNextSource()">
+            Switch to next server
+          </button>
+        </div>
+        <div class="controls">
+          <button id="play-pause" onclick="togglePlay()">&#9654; Play</button>
+          <div class="quality-wrap">
+            <label for="quality-select">Quality:</label>
+            <select id="quality-select" onchange="setQuality(this.value)"></select>
+          </div>
+          <div class="source-wrap">
+            <label for="source-select">Server:</label>
+            <select id="source-select" onchange="selectSource(this.value)"></select>
+          </div>
+        </div>
+      </div>
+
+      <aside class="telemetry">
+        <h2>Live telemetry (anonymous)</h2>
+        <pre id="log"></pre>
+      </aside>
+    </section>
+
+    <section class="media-list">
+      <h2>Try another title</h2>
+      <div class="cards" id="media-cards"></div>
+    </section>
+
+    <section class="sources-info">
+      <h2>The server list</h2>
+      <p>Priority is expressed by list order — the player manager always tries index&nbsp;0 first.
+      Servers marked <em>down</em> simulate a real outage and exercise the fallback chain.
+      This is the exact same shape of configuration a provider list uses in any aggregator,
+      only pointing at licensed content here.</p>
+      <table id="sources-table"></table>
+    </section>
+  </main>
+
+  <script src="player.js"></script>
+</body>
+</html>
