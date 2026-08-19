@@ -47,7 +47,11 @@ function renderProviderOptions() {
   PLAYER_PROVIDERS.forEach((provider) => {
     const option = document.createElement('option');
     option.value = provider.id;
-    option.textContent = provider.label + (provider.description ? ` (${provider.description})` : '');
+    // Ad-level indicator: ● = low, ●● = medium, ●●● = high.
+    // Plain-text dots so the native <select> renders them everywhere.
+    const adDots = provider.adLevel === 'low' ? '●' : provider.adLevel === 'medium' ? '●●' : '●●●';
+    const desc = provider.description ? ` — ${provider.description}` : '';
+    option.textContent = `${adDots} ${provider.label}${desc}`;
     els.selector.appendChild(option);
   });
 

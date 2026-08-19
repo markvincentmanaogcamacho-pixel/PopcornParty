@@ -82,23 +82,31 @@
     return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
   }
 
+  /* Platform-specific recommendation copy.
+     - Android: the zero-install path is the built-in Private DNS setting;
+       no app store needed, and it protects every app + this site.
+     - iOS: no system Private DNS menu; a free content blocker (AdGuard)
+       is the practical option.
+     - Desktop: browser extensions (uBlock Origin etc.) are the standard. */
   function buildTipMessage() {
-    var link;
-    if (isOnIOS()) {
+    var title, text, link, linkLabel;
+    if (isOnAndroid()) {
+      title = "Block ads free — no app needed";
+      text = "Android can block ads system-wide for free: Settings → Network → Private DNS → \u201cPrivate DNS provider hostname\u201d → enter dns.adguard.com → Save. Ads inside video players will mostly disappear, everywhere on your phone.";
+      link = "https://support.google.com/android/answer/9089731";
+      linkLabel = "Show me how (Android Help)";
+    } else if (isOnIOS()) {
+      title = "Keep your viewing ad-free";
+      text = "We noticed you might not have an ad blocker. A free content blocker (like AdGuard for Safari) helps remove ads inside video players.";
       link = "https://adguard.com/en/blog/adguard-ios.html";
-    } else if (isOnAndroid()) {
-      link = "https://play.google.com/store/apps/details?id=com.adguard.android.contentblocker";
+      linkLabel = "Get AdGuard for Safari";
     } else {
+      title = "Keep your viewing ad-free";
+      text = "We noticed you might not have an ad blocker. A free one (like uBlock Origin) helps remove ads inside video players.";
       link = "https://ublockorigin.com/";
+      linkLabel = "Get uBlock Origin";
     }
-    return {
-      title: "Keep your viewing ad-free",
-      text: isStandalone()
-        ? "We noticed you might not have an ad blocker. Install a free one (like AdGuard or uBlock Origin) to remove ads inside video players."
-        : "We noticed you might not have an ad blocker. A free one (like AdGuard or uBlock Origin) helps remove ads inside video players.",
-      link: link,
-      linkLabel: isOnIOS() ? "Get AdGuard for Safari" : isOnAndroid() ? "Get AdGuard for Android" : "Get uBlock Origin"
-    };
+    return { title: title, text: text, link: link, linkLabel: linkLabel };
   }
 
   function showTipBanner() {

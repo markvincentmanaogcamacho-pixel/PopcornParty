@@ -13,9 +13,31 @@
  * @property {string} id          - Internal identifier used as the <select> value
  * @property {string} label       - Human-readable name shown to the user
  * @property {string} description - One-line hint shown next to the label
+ * @property {'low'|'medium'|'high'} adLevel - Educational estimate of how many
+ *        ads/intrusive overlays this embed typically shows (1 = few, 3 = many).
+ *        These sites are third-party and change behavior over time, so this is
+ *        an approximate guide, not a guarantee. Popups inside their iframes are
+ *        best handled by the user's own ad blocker.
  * @property {string} movieURL    - URL template for movies
  * @property {string} tvURL       - URL template for TV shows
  *                                 Supported placeholders: {id}, {season}, {episode}
+ */
+
+/*
+ * Provider priority order (index 0 = tried first by the fallback chain and
+ * shown at the top of the Server dropdown).
+ *
+ * ORDERING RATIONALE (ads-first, then reliability):
+ *  1. vidsrc.cc      — known for the mildest ad experience of this set
+ *  2. vidsrc.pro     — good subtitle support, light ads
+ *  3. videasy        — generally light, newer player
+ *  4. vidsrc.me      — moderate; occasionally overlay ads
+ *  5. autoembed      — moderate; ads before playback on some titles
+ *  6. multiembed     — heavier; frequent pre-roll overlays
+ *  7. 2embed         — heaviest; known for aggressive overlays/popups
+ *
+ * If a server fails to load, the fallback chain in playerManager.js
+ * automatically skips it and tries the next one down the list.
  */
 
 /**
@@ -36,53 +58,60 @@ function buildEmbedURL(template, id, season = null, episode = null) {
 /** @type {ProviderDefinition[]} */
 const PLAYER_PROVIDERS = [
   {
-    id: 'vidsrc.pro',
-    label: 'Vidsrc Pro',
-    description: 'Best subtitle support',
-    movieURL: 'https://vidsrc.pro/embed/movie/{id}',
-    tvURL: 'https://vidsrc.pro/embed/tv/{id}/{season}/{episode}',
-  },
-  {
-    id: 'vidsrc.me',
-    label: 'Vidsrc.me',
-    description: '',
-    movieURL: 'https://vidsrc.me/embed/movie?tmdb={id}',
-    tvURL: 'https://vidsrc.me/embed/tv?tmdb={id}&season={season}&episode={episode}',
-  },
-  {
     id: 'vidsrc.cc',
     label: 'Vidsrc.cc',
-    description: '',
+    description: 'Mildest ads',
+    adLevel: 'low',
     movieURL: 'https://vidsrc.cc/v2/embed/movie/{id}',
     tvURL: 'https://vidsrc.cc/v2/embed/tv/{id}/{season}/{episode}',
   },
   {
+    id: 'vidsrc.pro',
+    label: 'Vidsrc Pro',
+    description: 'Best subtitle support, light ads',
+    adLevel: 'low',
+    movieURL: 'https://vidsrc.pro/embed/movie/{id}',
+    tvURL: 'https://vidsrc.pro/embed/tv/{id}/{season}/{episode}',
+  },
+  {
+    id: 'player.videasy.net',
+    label: 'Videasy',
+    description: 'Generally light',
+    adLevel: 'low',
+    movieURL: 'https://player.videasy.net/movie/{id}',
+    tvURL: 'https://player.videasy.net/tv/{id}/{season}/{episode}',
+  },
+  {
+    id: 'vidsrc.me',
+    label: 'Vidsrc.me',
+    description: 'Occasional overlay ads',
+    adLevel: 'medium',
+    movieURL: 'https://vidsrc.me/embed/movie?tmdb={id}',
+    tvURL: 'https://vidsrc.me/embed/tv?tmdb={id}&season={season}&episode={episode}',
+  },
+  {
+    id: 'autoembed',
+    label: 'AutoEmbed',
+    description: 'Pre-roll ads on some titles',
+    adLevel: 'medium',
+    movieURL: 'https://player.autoembed.cc/embed/movie/{id}',
+    tvURL: 'https://player.autoembed.cc/embed/tv/{id}/{season}/{episode}',
+  },
+  {
     id: 'multiembed',
     label: 'MultiEmbed',
-    description: '',
+    description: 'Frequent overlays',
+    adLevel: 'high',
     movieURL: 'https://multiembed.mov/?video_id={id}&tmdb=1',
     tvURL: 'https://multiembed.mov/?video_id={id}&tmdb=1&s={season}&e={episode}',
   },
   {
     id: '2embed',
     label: '2Embed',
-    description: '',
+    description: 'Heaviest ads — backup only',
+    adLevel: 'high',
     movieURL: 'https://www.2embed.cc/embed/{id}',
     tvURL: 'https://www.2embed.cc/embedtv/{id}/{season}/{episode}',
-  },
-  {
-    id: 'autoembed',
-    label: 'AutoEmbed',
-    description: '',
-    movieURL: 'https://player.autoembed.cc/embed/movie/{id}',
-    tvURL: 'https://player.autoembed.cc/embed/tv/{id}/{season}/{episode}',
-  },
-  {
-    id: 'player.videasy.net',
-    label: 'Videasy',
-    description: '',
-    movieURL: 'https://player.videasy.net/movie/{id}',
-    tvURL: 'https://player.videasy.net/tv/{id}/{season}/{episode}',
   },
 ];
 
@@ -92,7 +121,8 @@ const PLAYER_SETTINGS = {
   // before showing a "no response" hint and offering manual fallback.
   loadTimeoutMs: 12000,
   // Default provider when the site is opened for the first time.
-  defaultProviderId: 'vidsrc.pro',
+  // Updated to the new top-of-list server (cleanest ad experience).
+  defaultProviderId: 'vidsrc.cc',
   // Keys used for persisting user preferences.
   storageKeys: {
     lastProviderId: 'player:lastProviderId',
