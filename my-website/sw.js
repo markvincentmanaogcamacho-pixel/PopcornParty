@@ -15,6 +15,7 @@ const SHELL_ASSETS = [
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
   "/icons/apple-touch-icon.png",
+  "/doubleclick.js",
 ];
 
 /* Install — pre-cache the app shell */
