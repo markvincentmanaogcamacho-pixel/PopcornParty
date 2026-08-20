@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'party.popcorn.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "party.popcorn.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    signingConfigs {
+        release {
+            // Local dev keystore (committed for convenience). CI overrides
+            // these values via environment variables so the real keystore
+            // never lives in the repo.
+            storeFile = file(System.getenv('KEYSTORE_PATH') ?: 'popcornparty.keystore')
+            storePassword = System.getenv('KEYSTORE_PASSWORD') ?: 'popcornparty'
+            keyAlias = System.getenv('KEY_ALIAS') ?: 'popcornparty'
+            keyPassword = System.getenv('KEY_PASSWORD') ?: 'popcornparty'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
