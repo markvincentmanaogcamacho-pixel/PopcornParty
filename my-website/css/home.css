@@ -1100,25 +1100,56 @@ a.logo-link {
   }
 
   .search-modal {
-    padding-top: 20px;
+    padding-top: 60px; /* More space from top */
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto; /* Allow scrolling the modal itself */
   }
 
   .search-modal input {
     font-size: 16px; /* prevents iOS zoom on focus */
+    margin-bottom: 15px; /* Reduced margin */
+    width: 90%;
+  }
+
+  .search-filters {
+    flex-direction: row; /* Keep filters side-by-side but smaller */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 auto 15px;
+    width: 90%;
   }
 
   .search-filters select {
-    font-size: 16px;
-    padding: 12px 12px;
+    font-size: 13px;
+    padding: 8px 10px;
+    flex: 1 1 calc(33% - 8px); /* 3 items per row */
+    min-width: 80px;
+  }
+
+  .search-modal .suggestions {
+    width: 90%;
+    margin: 0 auto 15px;
+    max-height: 40vh; /* Limit height so results can be seen */
+    overflow-y: auto;
+  }
+
+  .suggestion-row {
+    padding: 6px 10px;
   }
 
   .suggestion-row img {
-    width: 80px;
-    height: 45px;
+    width: 60px;
+    height: 35px;
   }
 
   .suggestion-title {
-    font-size: 14px;
+    font-size: 13px;
+  }
+
+  .suggestion-meta {
+    font-size: 11px;
   }
   
   .banner {
@@ -1131,14 +1162,6 @@ a.logo-link {
   
   .banner p {
     font-size: 0.9rem;
-  }
-
-  .search-filters {
-    flex-direction: column;
-  }
-
-  .search-modal .suggestions {
-    width: 90%;
   }
 
   .btn {
