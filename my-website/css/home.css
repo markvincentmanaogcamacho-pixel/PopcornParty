@@ -81,6 +81,31 @@ a.logo-link {
   border-bottom: none;
 }
 
+.shoutout-banner {
+  position: relative;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 9px 16px;
+  margin-top: 95px;
+  background: linear-gradient(90deg, #7a0a10, #e50914, #7a0a10);
+  color: #fff7d6;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-align: center;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
+}
+
+.shoutout-banner i {
+  color: #ffd34e;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
 .search-bar {
   padding: 8px 12px;
   border-radius: 4px;
